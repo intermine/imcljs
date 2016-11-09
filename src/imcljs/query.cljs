@@ -36,7 +36,6 @@
                          :sortOrder (clojure.string/join " " (flatten (map (juxt :path :direction)
                                                                            (:orderBy query))))}]
 
-    (.log js/console "ster" (stringiy-map head-attributes))
     (str "<query " (stringiy-map head-attributes) ">"
          (apply str (map (partial map->xmlstr "constraint") (:where query)))
          "</query>")))

@@ -4,11 +4,12 @@
 
 (def missing? (complement contains?))
 
-(defn path [root path]
+(def default-enrichment {:maxp 0.05 :widget "pathway_enrichment" :correction "Holm-Bonferroni"})
+
+(defn url [root path]
   (str (scrub-url root) path))
 
 (defn wrap-auth [request-map token]
-  (.log js/console "TOKEN" token)
   (if token
     (assoc-in request-map [:headers "authorization"] (str "Token " token))
     request-map))
@@ -16,10 +17,12 @@
 (defn wrap-request-defaults [m]
   (assoc m :with-credentials? false))
 
-(defn wrap-query-defaults [request model query options]
+(defn wrap-post-defaults [request options & [model]]
   (assoc request :form-params (cond-> options
-                                      (missing? options :query) (assoc :query (->xml model query))
+                                      (contains? options :query) (assoc :query (->xml model (:query options)))
                                       (missing? options :format) (assoc :format "json"))))
 
-
+(defn wrap-get-defaults [request options]
+  (assoc request :query-params (cond-> options
+                                       (missing? options :format) (assoc :format "json"))))
 

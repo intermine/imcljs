@@ -1,39 +1,73 @@
 # imcljs
 
-FIXME: Write a one-line description of your library/project.
+A library for interacting with Intermine's web services.
 
-## Overview
+## Getting Start
 
-FIXME: Write a paragraph about the library/project and highlight its goals.
+Add the necessary dependency to your project:
 
-## Setup
+```[intermine/imcljs "SNAPSHOT-0.1.0"]```
 
-To get an interactive development environment run:
+imcljs returns channels so you'll also want to include core.async
 
-    lein figwheel
+```[org.clojure/core.async "0.2.395"]```
 
-and open your browser at [localhost:3449](http://localhost:3449/).
-This will auto compile and send all changes to the browser without the
-need to reload. After the compilation process is complete, you will
-get a Browser Connected REPL. An easy way to try it is:
+## Usage
 
-    (js/alert "Am I connected?")
+All imcljs funtions expect a map as their first parameter containing a mandtory `:root` key and two semi-optional keys, `:token` and `:model`.
 
-and you should see an alert in the browser window.
+```clj
+(def flymine {:root  "www.flymine.org/query"
+              :token nil ; Optional parameter for authentication
+              :model nil ; Required by some functions, such as executing a query
+              })
+```
 
-To clean all compiled files:
+We recommend fetching the `model` once and storing the above map for re-use across your application.
 
-    lein clean
+## Examples
 
-To create a production build run:
+### Fetching assets
 
-    lein do clean, cljsbuild once min
+```cljs
+; Fetch model (you'll need this for later.)
+(go (log (<! (fetch/model flymine)))
 
-And open your browser in `resources/public/index.html`. You will not
-get live reloading, nor a REPL. 
+; Fetch templates
+(go (log (<! (fetch/templates flymine)))
 
-## License
+; Fetch lists
+(go (log (<! (fetch/lists flymine)))
 
-Copyright © 2014 FIXME
+; Fetch summary fields
+(go (log (<! (fetch/summary-fields flymine)))
+```
 
-Distributed under the Eclipse Public License either version 1.0 or (at your option) any later version.
+### Fetching query results
+
+Most result-fetching functions require that the `:model` key be present in their first parameter.
+
+```cljs
+
+(ns my-app.core
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require [imcljs.fetch :as fetch]
+            [cljs.core.async :refer [<!]]))
+
+
+(def my-query {:from   "Gene"
+              :select ["Gene.secondaryIdentifier Gene.symbol"]
+              :where  [{:path  "Gene.symbol"
+                        :op    "="
+                        :value "a*"}]})
+
+; Rows
+(go (log (<! (fetch/rows flymine my-query))))
+
+; Records
+(go (log (<! (fetch/records flymine my-query {:size 10}))))
+
+; Row Count
+(go (log (<! (fetch/row-count flymine my-query))))
+
+```
