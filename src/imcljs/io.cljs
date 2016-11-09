@@ -7,7 +7,6 @@
             [imcljs.defaults :refer [url wrap-get-defaults wrap-request-defaults
                                      wrap-post-defaults wrap-auth]]))
 
-
 (defn body-
   "Parses the body of the web service response.
   Accepts an optional transformation function for further parsing,
