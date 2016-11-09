@@ -7,10 +7,8 @@
 
   :dependencies [[org.clojure/clojure "1.9.0-alpha13"]
                  [org.clojure/clojurescript "1.9.293"]
-                 [org.clojure/core.async "0.2.395"
-                  :exclusions [org.clojure/tools.reader]]
-                 [cljs-http "0.1.42"]
-                 [cljs-ajax "0.5.8"]]
+                 [org.clojure/core.async "0.2.395" :exclusions [org.clojure/tools.reader]]
+                 [cljs-http "0.1.42"]]
 
   :plugins [[lein-figwheel "0.5.8"]
             [lein-cljsbuild "1.1.4" :exclusions [[org.clojure/clojure]]]
