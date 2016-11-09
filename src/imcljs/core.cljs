@@ -1,5 +1,7 @@
 (ns imcljs.core
-  (:require [imcljs.io :as io] ))
+  (:require-macros [cljs.core.async.macros :refer [go go-loop]])
+  (:require [imcljs.fetch :as fetch]
+            [cljs.core.async :refer [put! chan <! >! timeout close!]]))
 
 (enable-console-print!)
 
@@ -14,5 +16,11 @@
   ;; optionally touch your app-state to force rerendering depending on
   ;; your application
   ;; (swap! app-state update-in [:__figwheel_counter] inc)
-  (.log js/console "d" (io/path {:root "www.flymine.org/query"} "/something"))
-)
+  (go (.log js/console "d" (<! (fetch/table-rows {:root  "www.flymine.org/query"
+                                                  :model {:name "genomic"}}
+                                                 {:from   "Gene"
+                                                  :select ["Gene.symbol"]
+                                                  :where  [{:path  "Gene.symbol"
+                                                            :op    "="
+                                                            :value "a*"}]})))))
+

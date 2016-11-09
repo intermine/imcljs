@@ -2,7 +2,7 @@
   :description "FIXME: write this!"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
-            :url "http://www.eclipse.org/legal/epl-v10.html"}
+            :url  "http://www.eclipse.org/legal/epl-v10.html"}
 
   :min-lein-version "2.7.1"
 
@@ -21,42 +21,42 @@
   :clean-targets ^{:protect false} ["resources/public/js/compiled" "target"]
 
   :cljsbuild {:builds
-              [{:id "dev"
+              [{:id           "dev"
                 :source-paths ["src"]
 
                 ;; the presence of a :figwheel configuration here
                 ;; will cause figwheel to inject the figwheel client
                 ;; into your build
-                :figwheel {:on-jsload "imcljs.core/on-js-reload"
-                           ;; :open-urls will pop open your application
-                           ;; in the default browser once Figwheel has
-                           ;; started and complied your application.
-                           ;; Comment this out once it no longer serves you.
-                           :open-urls ["http://localhost:3449/index.html"]}
+                :figwheel     {:on-jsload "imcljs.core/on-js-reload"
+                               ;; :open-urls will pop open your application
+                               ;; in the default browser once Figwheel has
+                               ;; started and complied your application.
+                               ;; Comment this out once it no longer serves you.
+                               :open-urls ["http://localhost:3449/index.html"]}
 
-                :compiler {:main imcljs.core
-                           :asset-path "js/compiled/out"
-                           :output-to "resources/public/js/compiled/imcljs.js"
-                           :output-dir "resources/public/js/compiled/out"
-                           :source-map-timestamp true
-                           ;; To console.log CLJS data-structures make sure you enable devtools in Chrome
-                           ;; https://github.com/binaryage/cljs-devtools
-                           :preloads [devtools.preload]}}
+                :compiler     {:main                 imcljs.core
+                               :asset-path           "js/compiled/out"
+                               :output-to            "resources/public/js/compiled/imcljs.js"
+                               :output-dir           "resources/public/js/compiled/out"
+                               :source-map-timestamp true
+                               ;; To console.log CLJS data-structures make sure you enable devtools in Chrome
+                               ;; https://github.com/binaryage/cljs-devtools
+                               :preloads             [devtools.preload]}}
                ;; This next build is an compressed minified build for
                ;; production. You can build this with:
                ;; lein cljsbuild once min
-               {:id "min"
+               {:id           "min"
                 :source-paths ["src"]
-                :compiler {:output-to "resources/public/js/compiled/imcljs.js"
-                           :main imcljs.core
-                           :optimizations :advanced
-                           :pretty-print false}}]}
+                :compiler     {:output-to     "resources/public/js/compiled/imcljs.js"
+                               :main          imcljs.core
+                               :optimizations :advanced
+                               :pretty-print  false}}]}
 
   :figwheel {;; :http-server-root "public" ;; default and assumes "resources"
              ;; :server-port 3449 ;; default
              ;; :server-ip "127.0.0.1"
-
-             :css-dirs ["resources/public/css"] ;; watch and update CSS
+             :server-port 5003
+             :css-dirs    ["resources/public/css"] ;; watch and update CSS
 
              ;; Start an nREPL server into the running figwheel process
              ;; :nrepl-port 7888
@@ -102,7 +102,7 @@
                    ;; for CIDER
                    ;; :plugins [[cider/cider-nrepl "0.12.0"]]
                    :repl-options {; for nREPL dev you really need to limit output
-                                  :init (set! *print-length* 50)
+                                  :init             (set! *print-length* 50)
                                   :nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}}}
 
-)
+  )

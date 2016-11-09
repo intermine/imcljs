@@ -8,6 +8,10 @@
        (reduce (fn [total [k v]] (str total (if total " ") (name k) "=" (str \" v \"))) nil m)
        "/>"))
 
+(defn stringiy-map
+  [m]
+  (reduce (fn [total [k v]] (str total (if total " ") (name k) "=" (str \" v \"))) nil m))
+
 (defn sterilize-query [query]
   (-> query
       (update :select
@@ -31,6 +35,8 @@
                          :view      (clojure.string/join " " (:select query))
                          :sortOrder (clojure.string/join " " (flatten (map (juxt :path :direction)
                                                                            (:orderBy query))))}]
-    (str "<query " (map->xmlstr "constraint" head-attributes) ">"
+
+    (.log js/console "ster" (stringiy-map head-attributes))
+    (str "<query " (stringiy-map head-attributes) ">"
          (apply str (map (partial map->xmlstr "constraint") (:where query)))
          "</query>")))
