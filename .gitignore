@@ -23,3 +23,5 @@ out
 **/.DS_Store
 .idea/
 *.iml
+/resources/public/js
+/resources/public/js/test

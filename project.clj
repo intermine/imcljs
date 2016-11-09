@@ -14,9 +14,15 @@
                  [cljs-ajax "0.5.8"]]
 
   :plugins [[lein-figwheel "0.5.8"]
-            [lein-cljsbuild "1.1.4" :exclusions [[org.clojure/clojure]]]]
+            [lein-cljsbuild "1.1.4" :exclusions [[org.clojure/clojure]]]
+            [lein-doo "0.1.7"]]
 
   :source-paths ["src"]
+
+  :doo {:build "test"
+        :alias {:default [:phantom]}}
+
+
 
   :clean-targets ^{:protect false} ["resources/public/js/compiled" "target"]
 
@@ -50,7 +56,14 @@
                 :compiler     {:output-to     "resources/public/js/compiled/imcljs.js"
                                :main          imcljs.core
                                :optimizations :advanced
-                               :pretty-print  false}}]}
+                               :pretty-print  false}}
+
+               {:id           "test"
+                :source-paths ["src" "test/cljs"]
+                :compiler     {:output-to     "resources/public/js/test/test.js"
+                               :output-dir    "resources/public/js/test"
+                               :main          imcljs.runner
+                               :optimizations :none}}]}
 
   :figwheel {;; :http-server-root "public" ;; default and assumes "resources"
              ;; :server-port 3449 ;; default
