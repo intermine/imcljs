@@ -1,5 +1,6 @@
 (ns imcljs.defaults
-  (:require [imcljs.query :refer [->xml]]
+  (:require [cljs.core.async :refer [chan]]
+            [imcljs.query :refer [->xml]]
             [imcljs.utils :refer [scrub-url]]))
 
 (def missing? (complement contains?))
@@ -14,8 +15,9 @@
     (assoc-in request-map [:headers "authorization"] (str "Token " token))
     request-map))
 
-(defn wrap-request-defaults [m]
-  (assoc m :with-credentials? false))
+(defn wrap-request-defaults [m & [xform]]
+  (assoc m :with-credentials? false
+           :channel (chan 1 (map (if xform (comp xform :body) :body)))))
 
 (defn wrap-post-defaults [request options & [model]]
   (assoc request :form-params (cond-> options

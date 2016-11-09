@@ -8,9 +8,7 @@
 (defn on-js-reload []
   (def flymine {:root  "www.flymine.org/query"
                 :model {:name "genomic"}})
-
-
-
+  
   (def a-query {:from   "Gene"
                 :select ["Gene.secondaryIdentifier Gene.symbol"]
                 :where  [{:path  "Gene.symbol"

@@ -20,6 +20,7 @@
   :source-paths ["src"]
 
   :doo {:build "test"
+        :paths {:phantom "phantomjs --web-security=false"}
         :alias {:default [:phantom]}}
 
 
