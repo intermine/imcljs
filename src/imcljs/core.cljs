@@ -15,6 +15,12 @@
                           :op    "="
                           :value "a*"}]})
 
-  (go (.log js/console "templates" (<! (fetch/templates flymine))))
-  (go (.log js/console "enrichment" (<! (fetch/enrichment flymine {:list "PL FlyTF_putativeTFs"}))))
+  (def region {:from   "SequenceFeature"
+               :select ["SequenceFeature.id"]
+               :where  [{:path   "SequenceFeature"
+                         :op     "ISA"
+                         :values ["Exon" "Intron" "Gene"]}]})
+
+  ;(go (.log js/console "templates" (<! (fetch/templates flymine))))
+  ;(go (.log js/console "enrichment" (<! (fetch/enrichment flymine {:list "PL FlyTF_putativeTFs"}))))
   (go (.log js/console "rows" (<! (fetch/rows flymine a-query)))))

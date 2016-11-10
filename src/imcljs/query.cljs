@@ -1,19 +1,24 @@
 (ns imcljs.query
   (:require [clojure.string :refer [join]]))
 
+(defn value [x] (str "<value>" x "</value>"))
+
 (defn map->xmlstr
   "xml string representation of an edn map.
   (map->xlmstr constraint {:key1 val1 key2 val2}) => <constraint key1=val1 key2=val2 />"
   [elem m]
-  (str "<" elem " "
-       (reduce (fn [total [k v]]
-                 (str total (if total " ") (name k)
-                      "="
-                      (str \" (if (string? v) v (join ", " v)) \")))
-               nil m)
-       "/>"))
-
-
+  (let [values (:values m)]
+    (str "<" elem " "
+         (reduce (fn [total [k v]]
+                   (if (not= k :values)
+                     (str total (if total " ") (name k)
+                          "="
+                          (str \" v \"))
+                     total))
+                 nil m)
+         (if values
+           (str ">" (apply str (map value values)) "</" elem ">")
+           "/>"))))
 
 (defn stringiy-map
   [m]
@@ -42,7 +47,6 @@
                          :view      (clojure.string/join " " (:select query))
                          :sortOrder (clojure.string/join " " (flatten (map (juxt :path :direction)
                                                                            (:orderBy query))))}]
-
     (str "<query " (stringiy-map head-attributes) ">"
          (apply str (map (partial map->xmlstr "constraint") (:where query)))
          "</query>")))
