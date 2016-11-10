@@ -1,12 +1,19 @@
-(ns imcljs.query)
+(ns imcljs.query
+  (:require [clojure.string :refer [join]]))
 
 (defn map->xmlstr
   "xml string representation of an edn map.
   (map->xlmstr constraint {:key1 val1 key2 val2}) => <constraint key1=val1 key2=val2 />"
   [elem m]
   (str "<" elem " "
-       (reduce (fn [total [k v]] (str total (if total " ") (name k) "=" (str \" v \"))) nil m)
+       (reduce (fn [total [k v]]
+                 (str total (if total " ") (name k)
+                      "="
+                      (str \" (if (string? v) v (join ", " v)) \")))
+               nil m)
        "/>"))
+
+
 
 (defn stringiy-map
   [m]
