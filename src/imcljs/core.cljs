@@ -1,7 +1,9 @@
 (ns imcljs.core
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [imcljs.fetch :as fetch]
-            [cljs.core.async :refer [<!]]))
+            [cljs.core.async :refer [<!]]
+            [cljs-http.client :as client]
+            [imcljs.path :as path]))
 
 (enable-console-print!)
 
@@ -43,8 +45,12 @@
                        :value "D. melanogaster"}]})
 
 
+  (let [model-req (client/get "http://localhost:9001/model.json" {:with-credentials? false})]
+    (go (let [model (:model (:body (<! model-req)))]
+          (.log js/console "Walked" (path/trim-to-last-class model "Gene.organism.shortName")))))
+
 
   ;(go (.log js/console "templates" (<! (fetch/templates flymine))))
   ;(go (.log js/console "enrichment" (<! (fetch/enrichment flymine {:list "PL FlyTF_putativeTFs"}))))
-  (go (.log js/console "rows" (<! (fetch/rows flymine a-query))))
+  ;(go (.log js/console "rows" (<! (fetch/rows flymine a-query))))
   )

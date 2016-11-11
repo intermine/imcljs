@@ -1,4 +1,4 @@
-(defproject intermine/imcljs "0.1.4-SNAPSHOT"
+(defproject intermine/imcljs "0.1.5-SNAPSHOT"
   :description "imcljs"
   :license {:name "Eclipse Public License"
             :url  "http://www.eclipse.org/legal/epl-v10.html"}
@@ -28,7 +28,7 @@
               [{:id           "dev"
                 :source-paths ["src"]
                 :figwheel     {:on-jsload "imcljs.core/on-js-reload"
-                               :open-urls ["http://localhost:3449/index.html"]}
+                               :open-urls ["http://localhost:5003/index.html"]}
                 :compiler     {:main                 imcljs.core
                                :asset-path           "js/compiled/out"
                                :output-to            "resources/public/js/compiled/imcljs.js"
