@@ -3,7 +3,8 @@
   (:require [imcljs.fetch :as fetch]
             [cljs.core.async :refer [<!]]
             [cljs-http.client :as client]
-            [imcljs.path :as path]))
+            [imcljs.path :as path]
+            [imcljs.entity :as entity]))
 
 (enable-console-print!)
 
@@ -47,7 +48,7 @@
 
   (let [model-req (client/get "http://localhost:9001/model.json" {:with-credentials? false})]
     (go (let [model (:model (:body (<! model-req)))]
-          (.log js/console "Walked" (path/trim-to-last-class model "Gene.organism.shortName")))))
+          (.log js/console "Walked" (count (entity/direct-descendant-of model :SequenceFeature))))))
 
 
   ;(go (.log js/console "templates" (<! (fetch/templates flymine))))

@@ -2,6 +2,8 @@
 
 (def does-not-contain? (complement contains?))
 
+(defn one-of? [haystack needle] (some? (some #{needle} haystack)))
+
 (defn missing-http?- [val] (not (re-find #"^https?://" val)))
 
 (defn missing-service?- [val] (not (re-find #"/service$" val)))
