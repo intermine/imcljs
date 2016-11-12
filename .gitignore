@@ -23,5 +23,6 @@ out
 **/.DS_Store
 .idea/
 *.iml
+.lein-*
 /resources/public/js
 /resources/public/js/test
