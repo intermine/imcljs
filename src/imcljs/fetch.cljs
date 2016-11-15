@@ -1,5 +1,5 @@
 (ns imcljs.fetch
-  (:require [imcljs.io :refer [restful]]))
+  (:require [imcljs.internal.io :refer [restful]]))
 
 ; Quicksearch
 
@@ -56,7 +56,7 @@
 (defn enrichment
   "Returns enrichment results"
   [service & [options]]
-  (restful :post "/list/enrichment" service (merge imcljs.defaults/default-enrichment options)))
+  (restful :post "/list/enrichment" service (merge imcljs.internal.defaults/default-enrichment options)))
 
 
 

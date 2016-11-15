@@ -1,7 +1,7 @@
-(ns imcljs.defaults
+(ns imcljs.internal.defaults
   (:require [cljs.core.async :refer [chan]]
             [imcljs.query :refer [->xml]]
-            [imcljs.utils :refer [scrub-url]]))
+            [imcljs.internal.utils :refer [scrub-url]]))
 
 (def missing? (complement contains?))
 

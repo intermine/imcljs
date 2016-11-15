@@ -1,4 +1,4 @@
-(ns imcljs.utils)
+(ns imcljs.internal.utils)
 
 (def does-not-contain? (complement contains?))
 

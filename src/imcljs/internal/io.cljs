@@ -1,11 +1,11 @@
-(ns imcljs.io
+(ns imcljs.internal.io
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [cljs.core.async :refer [put! chan <! >! timeout close!]]
             [cljs-http.client :refer [post get]]
-            [imcljs.utils :refer [scrub-url]]
+            [imcljs.internal.utils :refer [scrub-url]]
             [imcljs.query :refer [->xml]]
-            [imcljs.defaults :refer [url wrap-get-defaults wrap-request-defaults
-                                     wrap-post-defaults wrap-auth]]))
+            [imcljs.internal.defaults :refer [url wrap-get-defaults wrap-request-defaults
+                                              wrap-post-defaults wrap-auth]]))
 
 ;(defn body-
 ;  "Parses the body of the web service response.

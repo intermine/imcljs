@@ -1,5 +1,5 @@
 (ns imcljs.path
-  (:require [imcljs.utils :refer [does-not-contain?]]
+  (:require [imcljs.internal.utils :refer [does-not-contain?]]
             [clojure.string :refer [split join]]))
 
 (def path-types

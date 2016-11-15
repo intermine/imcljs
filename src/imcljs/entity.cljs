@@ -1,5 +1,5 @@
 (ns imcljs.entity
-  (:require [imcljs.utils :refer [one-of?]]))
+  (:require [imcljs.internal.utils :refer [one-of?]]))
 
 (defn direct-descendant-of
   "Returns classes that directly extend the provided class

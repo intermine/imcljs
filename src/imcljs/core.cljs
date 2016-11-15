@@ -50,9 +50,9 @@
                        :value "D. melanogaster"}]})
 
 
-  (let [model-req (client/get "http://localhost:9001/model.json" {:with-credentials? false})]
-    (go (let [model (:model (:body (<! model-req)))]
-          (.log js/console "Walked" (count (entity/direct-descendant-of model :SequenceFeature))))))
+  ;(let [model-req (client/get "http://localhost:9001/model.json" {:with-credentials? false})]
+  ;  (go (let [model (:model (:body (<! model-req)))]
+  ;        (.log js/console "Walked" (count (entity/direct-descendant-of model :SequenceFeature))))))
 
 
   ;(go (.log js/console "templates" (<! (fetch/templates flymine))))

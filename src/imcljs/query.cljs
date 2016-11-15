@@ -1,13 +1,7 @@
 (ns imcljs.query
-  (:require [clojure.string :refer [join]]
-            [clojure.spec :as s]))
+  (:require [clojure.string :refer [join]]))
 
 (defn value [x] (str "<value>" x "</value>"))
-
-
-;
-;(s/def ::constraint (s/keys :req-un [::path]
-;                            :opt-un [::value]))
 
 (defn map->xmlstr
   "xml string representation of an edn map.
