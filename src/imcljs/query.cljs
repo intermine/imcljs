@@ -34,9 +34,10 @@
   (update query :select
           (partial mapv
                    (fn [path]
-                     (if (= (:from query) (first (clojure.string/split path ".")))
-                       path
-                       (str (:from query) "." path))))))
+                     (let [path (name path)]
+                       (if (= (:from query) (first (clojure.string/split path ".")))
+                         path
+                         (str (:from query) "." path)))))))
 
 (defn enforce-sorting [query]
   (update query :orderBy
