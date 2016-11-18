@@ -4,6 +4,8 @@
             [cljs.core.async :refer [<!]]
             [cljs-http.client :as client]
             [imcljs.path :as path]
+            [imcljs.query :as query]
+            [imcljs.save :as save]
             [imcljs.entity :as entity]))
 
 
@@ -16,11 +18,11 @@
   (def flymine {:root  "www.flymine.org/query"
                 :model {:name "genomic"}})
 
-  (def a-query {:select ["Gene.secondaryIdentifier Gene.symbol"]
+  (def a-query {:select  ["Gene.symbol" "Gene.secondaryIdentifier" "Gene.homologues.homologue.name"]
                 :orderBy [{:symbol "asc"}]
-                :where  [{:path  "Gene.symbol"
-                          :op    "="
-                          :value "a*"}]})
+                :where   [{:path  "symbol"
+                           :op    "="
+                           :value "a*"}]})
 
 
   (def region {:from    "SequenceFeature"
@@ -45,15 +47,28 @@
                        :values ["2L:14615455..14619002"
                                 "2R:5866646..5868384"
                                 "3R:2578486..2580016"]}
-                      {:path   "SequenceFeature.organism.shortName"
-                       :op     "="
+                      {:path  "SequenceFeature.organism.shortName"
+                       :op    "="
                        :value "D. melanogaster"}]})
 
 
-  ;(let [model-req (client/get "http://localhost:9001/model.json" {:with-credentials? false})]
-  ;  (go (let [model (:model (:body (<! model-req)))]
-  ;        (.log js/console "Walked" (count (entity/direct-descendant-of model :SequenceFeature))))))
+  (def ids-constraint-shortcut
+    {:from   "Gene"
+     :select ["Gene.symbol"]
+     :where  [{:path "Gene"
+               :ids  [1000100 1000781 1001050 1001183 1001292]}]})
 
+
+  (go
+    (.log js/console "d" (<! (fetch/table-rows flymine a-query))))
+
+
+  ;(go
+  ;  (let [fm (assoc flymine :token (<! (fetch/session flymine)))]
+  ;    (save/im-list fm a-query)))
+  #_(go
+      (let [model (<! (fetch/model flymine))]
+        (.log js/console (query/deconstruct-by-class model a-query))))
 
   ;(go (.log js/console "templates" (<! (fetch/templates flymine))))
   ;(go (.log js/console "enrichment" (<! (fetch/enrichment flymine {:list "PL FlyTF_putativeTFs"}))))

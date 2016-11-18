@@ -3,7 +3,6 @@
   (:require [cljs.core.async :refer [put! chan <! >! timeout close!]]
             [cljs-http.client :refer [post get]]
             [imcljs.internal.utils :refer [scrub-url]]
-            [imcljs.query :refer [->xml]]
             [imcljs.internal.defaults :refer [url wrap-get-defaults wrap-request-defaults
                                               wrap-post-defaults wrap-auth]]))
 
