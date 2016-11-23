@@ -58,9 +58,12 @@
   [service & [options]]
   (restful :post "/list/enrichment" service (merge imcljs.internal.defaults/default-enrichment options)))
 
+; Versions
 
+(defn version-release
+  [service]
+  (restful :get "/version/release" service {:format "text"}))
 
-
-
-
-
+(defn version-intermine
+  [service]
+  (restful :get "/version/intermine" service {:format "text"}))
