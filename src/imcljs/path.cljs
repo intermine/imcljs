@@ -73,3 +73,16 @@
   [model path]
   (let [done (take-while #(does-not-contain? % :type) (walk model path))]
     (join-path (take (count done) (split-path path)))))
+
+(defn relationships
+  "Given a model, a class, and a collection or reference, return the class of the collection or reference.
+  (referenced-class im-model :Gene :homologues)
+  => :Gene"
+  [model class-kw]
+  (apply merge (map (get-in model [:classes class-kw]) [:references :collections])))
+
+(defn friendly
+  ([model path]
+   (friendly model (if (string? path) (split-path path) path) []))
+  ([model [class-kw & [path & remaining]] trail]
+   (get-in (relationships model class-kw) [path :referencedType])))

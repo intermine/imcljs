@@ -17,12 +17,14 @@
 (defn on-js-reload []
   (def flymine {:root  "www.flymine.org/query"
                 :model {:name "genomic"}})
+  (def mousemine {:root  "www.mousemine.org/mousemine"
+                  :model {:name "genomic"}})
 
   (def a-query {:select  ["Gene.symbol" "Gene.secondaryIdentifier" "Gene.homologues.homologue.name"]
                 :orderBy [{:symbol "asc"}]
                 :where   [{:path  "symbol"
                            :op    "="
-                           :value "a*"}]})
+                           :value "ab*"}]})
 
 
   (def region {:from    "SequenceFeature"
@@ -58,9 +60,51 @@
      :where  [{:path "Gene"
                :ids  [1000100 1000781 1001050 1001183 1001292]}]})
 
+  (def subclass-query
+    {:from    "OntologyAnnotation",
+     :select  ["subject.primaryIdentifier"
+               "subject.symbol"
+               "evidence.baseAnnotations.subject.symbol"
+               "evidence.baseAnnotations.subject.background.name"
+               "evidence.baseAnnotations.subject.zygosity"
+               "ontologyTerm.identifier"
+               "ontologyTerm.name"],
+     :orderBy [{:path "subject.symbol", :direction "ASC"}],
+     :where   [{:path "ontologyTerm.parents", :type "MPTerm"}
+               {:path "ontologyTerm", :type "MPTerm"}
+               {:path "subject", :type "SequenceFeature"}
+               {:path "evidence.baseAnnotations.subject", :type "Genotype"}
+               {:path "ontologyTerm.parents", :op "LOOKUP", :value "*circulating glucose*", :code "A"}]})
+
+  (def subclass-query-2
+    {:name            "Lookup_MPhenotype",
+     :title           "Lookup --> Mammalian phenotypes (MP terms)",
+     :description     "Returns MP terms whose names match the specified search terms.",
+     :constraintLogic "A and B",
+     :from            "MPTerm",
+     :select          ["name" "identifier" "description"],
+     :orderBy         [{:path "name", :direction "ASC"}],
+     :where           [{:path       "obsolete",
+                        :op         "=",
+                        :value      "false", :code "B",
+                        :editable   false,
+                        :switched   "LOCKED",
+                        :switchable false}
+                       {:path       "name",
+                        :op         "CONTAINS",
+                        :value      "hemoglobin",
+                        :code       "A",
+                        :editable   true,
+                        :switched   "LOCKED",
+                        :switchable false}]})
+
+  ;(go
+  ;  (.log js/console "d" (<! (fetch/table-rows mousemine subclass-query-2))))
+
 
   (go
-    (.log js/console "d" (<! (fetch/table-rows flymine a-query))))
+    (let [model (<! (fetch/model flymine))]
+      (.log js/console (query/deconstruct-by-class model a-query))))
 
 
   ;(go
