@@ -1,6 +1,8 @@
 (ns imcljs.query
   (:require [imcljs.path :as path]
-            [clojure.string :refer [join]]))
+            [clojure.string :refer [join]]
+            [clojure.set :refer [difference]]
+            [imcljs.internal.utils :refer [alphabet]]))
 
 (defn value [x] (str "<value>" x "</value>"))
 
@@ -63,8 +65,18 @@
                    (fn [constraint]
                      (let [path (:path constraint)]
                        (if (= (:from query) (first (clojure.string/split path ".")))
-                        constraint
-                        (assoc constraint :path (str (:from query) "." path))))))))
+                         constraint
+                         (assoc constraint :path (str (:from query) "." path))))))))
+
+(defn enforce-constraints-have-code [query]
+  (update query :where
+          (fn [constraints]
+            (reduce (fn [total {:keys [code] :as constraint}]
+                      (if (some? code)
+                        (conj total constraint)
+                        (let [existing-codes      (set (remove nil? (concat (map :code constraints) (map :code total))))
+                              next-available-code (first (difference alphabet existing-codes))]
+                          (conj total (assoc constraint :code next-available-code))))) [] constraints))))
 
 (defn enforce-sorting [query]
   (update query :orderBy
@@ -78,13 +90,12 @@
                          order
                          (assoc order :path (str (:from query) "." (:path order)))))))))
 
-
 (def sterilize-query (comp
                        enforce-sorting
                        enforce-constraints-have-class
+                       enforce-constraints-have-code
                        enforce-views-have-class
                        enforce-origin))
-
 
 (defn ->xml
   "Returns the stringfied XML representation of an EDN intermine query."
@@ -97,7 +108,6 @@
     (str "<query " (stringiy-map head-attributes) ">"
          (apply str (map (partial map->xmlstr "constraint") (:where query)))
          "</query>")))
-
 
 (defn deconstruct-by-class
   "Deconstructs a query by its views and groups them by class.

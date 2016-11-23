@@ -10,6 +10,8 @@
 
 (defn append- [text val] (str val text))
 
+(def alphabet (apply sorted-set (clojure.string/split "ABCDEFGHIJKLMNOPQRSTUVWXYZ" "")))
+
 (defn scrub-url
   "Ensures that a url starts with an http protocol and ends with /service"
   [url]
