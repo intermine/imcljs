@@ -56,7 +56,7 @@
 (defn widgets
   "Returns list of widgets available for a given mine"
   [service & [options]]
-  (restful :post "/widgets" service {:format "json"}))
+  (restful :get "/widgets" service {:format "json"}))
 
 ; Enrichment
 
