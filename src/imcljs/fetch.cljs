@@ -51,12 +51,20 @@
   [service & [options]]
   (restful :get "/session" service options :token))
 
+; Widgets
+
+(defn widgets
+  "Returns list of widgets available for a given mine"
+  [service & [options]]
+  (restful :post "/widgets" service {:format "json"}))
+
 ; Enrichment
 
 (defn enrichment
   "Returns enrichment results"
   [service & [options]]
   (restful :post "/list/enrichment" service (merge imcljs.internal.defaults/default-enrichment options)))
+
 
 ; Versions
 
