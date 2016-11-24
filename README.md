@@ -6,7 +6,9 @@ A library for interacting with Intermine's web services.
 
 Add the necessary dependency to your project:
 
-```[intermine/imcljs "SNAPSHOT-0.1.0"]```
+```
+[![Clojars Project](https://img.shields.io/clojars/v/intermine/imcljs.svg)](https://clojars.org/intermine/imcljs)
+```
 
 imcljs returns channels so you'll also want to include core.async
 
