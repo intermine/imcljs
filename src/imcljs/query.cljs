@@ -1,6 +1,8 @@
 (ns imcljs.query
   (:require [imcljs.path :as path]
-            [clojure.string :refer [join]]))
+            [clojure.string :refer [join]]
+            [clojure.set :refer [difference]]
+            [imcljs.internal.utils :refer [alphabet]]))
 
 (defn value [x] (str "<value>" x "</value>"))
 
@@ -19,6 +21,11 @@
       (assoc :op "ONE OF")
       (update :path add-id)))
 
+(def html-entities {"<"  "&lt;"
+                    "<=" "&lt;="
+                    ">"  "&gt;"
+                    ">=" "&gt;="})
+
 (defn map->xmlstr
   "xml string representation of an edn map.
   (map->xlmstr constraint {:key1 val1 key2 val2}) => <constraint key1=val1 key2=val2 />"
@@ -32,7 +39,7 @@
                    (if (not= k :values)
                      (str total (if total " ") (name k)
                           "="
-                          (str \" v \"))
+                          (str \" (if (= k :op) (get html-entities v v) v) \"))
                      total))
                  nil m)
          (if values
@@ -63,8 +70,18 @@
                    (fn [constraint]
                      (let [path (:path constraint)]
                        (if (= (:from query) (first (clojure.string/split path ".")))
-                        constraint
-                        (assoc constraint :path (str (:from query) "." path))))))))
+                         constraint
+                         (assoc constraint :path (str (:from query) "." path))))))))
+
+(defn enforce-constraints-have-code [query]
+  (update query :where
+          (fn [constraints]
+            (reduce (fn [total {:keys [code] :as constraint}]
+                      (if (some? code)
+                        (conj total constraint)
+                        (let [existing-codes      (set (remove nil? (concat (map :code constraints) (map :code total))))
+                              next-available-code (first (difference alphabet existing-codes))]
+                          (conj total (assoc constraint :code next-available-code))))) [] constraints))))
 
 (defn enforce-sorting [query]
   (update query :orderBy
@@ -78,13 +95,12 @@
                          order
                          (assoc order :path (str (:from query) "." (:path order)))))))))
 
-
 (def sterilize-query (comp
                        enforce-sorting
                        enforce-constraints-have-class
+                       enforce-constraints-have-code
                        enforce-views-have-class
                        enforce-origin))
-
 
 (defn ->xml
   "Returns the stringfied XML representation of an EDN intermine query."
@@ -98,7 +114,6 @@
          (apply str (map (partial map->xmlstr "constraint") (:where query)))
          "</query>")))
 
-
 (defn deconstruct-by-class
   "Deconstructs a query by its views and groups them by class.
   (deconstruct-by-class model query)
@@ -109,6 +124,6 @@
     (reduce (fn [path-map next-path]
               (update path-map (path/class model next-path)
                       assoc (path/trim-to-last-class model next-path)
-                      (assoc query :select [(str (path/trim-to-last-class model next-path) ".id")])))
+                      {:query (assoc query :select [(str (path/trim-to-last-class model next-path) ".id")])}))
             {} (:select query))))
 

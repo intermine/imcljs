@@ -12,7 +12,7 @@
 
 (defn table-rows
   [service query & [options]]
-  (restful :post "/query/results/tablerows" service {:query query}))
+  (restful :post "/query/results/tablerows" service (merge {:query query} options)))
 
 (defn records
   [service query & [options]]

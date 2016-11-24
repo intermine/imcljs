@@ -15,6 +15,9 @@
     (assoc-in request-map [:headers "authorization"] (str "Token " token))
     request-map))
 
+(defn wrap-accept [request-map]
+  (assoc-in request-map [:headers "accept"] "application/json"))
+
 (defn wrap-request-defaults [m & [xform]]
   (assoc m :with-credentials? false
            :channel (chan 1 (map (if xform (comp xform :body) :body)))))
