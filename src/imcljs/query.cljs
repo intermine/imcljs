@@ -21,6 +21,11 @@
       (assoc :op "ONE OF")
       (update :path add-id)))
 
+(def html-entities {"<"  "&lt;"
+                    "<=" "&lt;="
+                    ">"  "&gt;"
+                    ">=" "&gt;="})
+
 (defn map->xmlstr
   "xml string representation of an edn map.
   (map->xlmstr constraint {:key1 val1 key2 val2}) => <constraint key1=val1 key2=val2 />"
@@ -34,7 +39,7 @@
                    (if (not= k :values)
                      (str total (if total " ") (name k)
                           "="
-                          (str \" v \"))
+                          (str \" (if (= k :op) (get html-entities v v) v) \"))
                      total))
                  nil m)
          (if values

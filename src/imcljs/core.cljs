@@ -106,15 +106,14 @@
                     :op    "IN"
                     :value "PL FlyAtlas_maleglands_top"}
                    {:path "Gene.symbol"
-                    :op "="
-                    :value "intr"
+                    :op "<="
+                    :value "100"
                     :code "A"}]})
-
-
 
 
       (go
         (.log js/console "d" (<! (fetch/table-rows flymine constraint-query))))
+
 
 
       #_(go
