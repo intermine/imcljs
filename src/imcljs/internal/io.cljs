@@ -4,7 +4,7 @@
             [cljs-http.client :refer [post get]]
             [imcljs.internal.utils :refer [scrub-url]]
             [imcljs.internal.defaults :refer [url wrap-get-defaults wrap-request-defaults
-                                              wrap-post-defaults wrap-auth]]))
+                                              wrap-post-defaults wrap-auth wrap-accept]]))
 
 ;(defn body-
 ;  "Parses the body of the web service response.
@@ -23,6 +23,7 @@
   [path {:keys [root token model]} options & [xform]]
   (post (url root path)
         (-> {} ; Blank request map
+            ;(wrap-accept)
             (wrap-request-defaults xform) ; Add defaults such as with-credentials false?
             (wrap-post-defaults options model) ; Add form params
             (wrap-auth token))))
@@ -33,6 +34,7 @@
   [path {:keys [root token model]} options & [xform]]
   (get (url root path)
        (-> {} ; Blank request map
+           ;(wrap-accept)
            (wrap-request-defaults xform) ; Add defaults such as with-credentials false?
            (wrap-get-defaults options) ; Add query params
            (wrap-auth token))))
