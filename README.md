@@ -6,7 +6,7 @@ A library for interacting with Intermine's web services.
 
 Add the necessary dependency to your project:
 
-![](https://clojars.org/compojure/latest-version.svg)
+![](https://clojars.org/intermine/imcljs/latest-version.svg)
 
 imcljs returns channels so you'll also want to include core.async
 
