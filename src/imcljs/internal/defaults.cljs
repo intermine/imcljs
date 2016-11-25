@@ -31,3 +31,6 @@
   (assoc request :query-params (cond-> options
                                        (missing? options :format) (assoc :format "json"))))
 
+(defn wrap-delete-defaults [request options]
+  (assoc request :query-params (cond-> options
+                                       (missing? options :format) (assoc :format "json"))))

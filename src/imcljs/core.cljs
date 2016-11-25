@@ -17,6 +17,10 @@
 (defn on-js-reload []
   (def flymine {:root  "beta.flymine.org/beta"
                 :model {:name "genomic"}})
+
+  (def flymine-beta {:root  "beta.flymine.org/beta"
+                     :model {:name "genomic"}})
+
   (def mousemine {:root  "www.mousemine.org/mousemine"
                   :model {:name "genomic"}})
 
@@ -115,8 +119,12 @@
      :select  ["Gene.symbol" "Gene.secondaryIdentifier"]
      :orderBy [{:symbol "asc"}]})
 
-
   (go
+    (let [fm (assoc flymine-beta :token (<! (fetch/session flymine-beta)))]
+      (save/im-list-union fm "UNION" ["pie" "five_genes"])))
+
+
+  #_(go
     (.log js/console "d" (<! (fetch/table-rows flymine big-query {:start 50 :size 1}))))
 
 

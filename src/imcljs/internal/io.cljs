@@ -1,10 +1,11 @@
 (ns imcljs.internal.io
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [cljs.core.async :refer [put! chan <! >! timeout close!]]
-            [cljs-http.client :refer [post get]]
+            [cljs-http.client :refer [post get delete]]
             [imcljs.internal.utils :refer [scrub-url]]
             [imcljs.internal.defaults :refer [url wrap-get-defaults wrap-request-defaults
-                                              wrap-post-defaults wrap-auth wrap-accept]]))
+                                              wrap-post-defaults wrap-auth wrap-accept
+                                              wrap-delete-defaults]]))
 
 ;(defn body-
 ;  "Parses the body of the web service response.
@@ -28,6 +29,16 @@
             (wrap-post-defaults options model) ; Add form params
             (wrap-auth token))))
 
+(defn delete-wrapper-
+  "Returns the results of queries as table rows."
+  [path {:keys [root token model]} options & [xform]]
+  (delete (url root path)
+          (-> {} ; Blank request map
+              ;(wrap-accept)
+              (wrap-request-defaults xform) ; Add defaults such as with-credentials false?
+              (wrap-delete-defaults options) ; Add form params
+              (wrap-auth token))))
+
 
 (defn request-wrapper-
   "Returns the results of queries as table rows."
@@ -50,3 +61,6 @@
   ;(body- (request-wrapper- path service options) xform)
   (request-wrapper- path service options xform)
   )
+
+(defmethod restful :delete [method path service options & [xform]]
+  (delete-wrapper- path service options xform))
