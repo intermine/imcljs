@@ -123,6 +123,10 @@
     (let [fm (assoc flymine-beta :token (<! (fetch/session flymine-beta)))]
       (save/im-list-union fm "UNION" ["pie" "five_genes"])))
 
+  (go
+    (let [fm (assoc flymine-beta :token (<! (fetch/session flymine-beta)))]
+      (.log js/console "D" (<! (save/im-list-copy fm "cookies" "cookies2")))))
+
 
   #_(go
     (.log js/console "d" (<! (fetch/table-rows flymine big-query {:start 50 :size 1}))))
