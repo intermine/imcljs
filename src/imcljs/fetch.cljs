@@ -70,8 +70,10 @@
 
 (defn version-release
   [service]
+  "Returns the string identifying the build - 'flymine 23', for example."
   (restful :get "/version/release" service {:format "text"}))
 
 (defn version-intermine
+  "Returns the version of InterMine being run, e.g. '1.6.6'"
   [service]
   (restful :get "/version/intermine" service {:format "text"}))
