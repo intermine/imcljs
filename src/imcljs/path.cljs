@@ -27,7 +27,7 @@
   (referenced-class im-model :Gene :homologues)
   => :Gene"
   [model class-kw field-kw]
-  (keyword (:referencedType (get (apply merge (map (get-in model [:classes class-kw])[:references :collections])) field-kw))))
+  (keyword (:referencedType (get (apply merge (map (get-in model [:classes class-kw]) [:references :collections])) field-kw))))
 
 (defn is-attribute [class value]
   (get-in class [:attributes value]))
@@ -92,7 +92,10 @@
   (apply merge (map (get-in model [:classes class-kw]) [:references :collections])))
 
 (defn friendly
-  ([model path]
-   (friendly model (if (string? path) (split-path path) path) []))
-  ([model [class-kw & [path & remaining]] trail]
-   (get-in (relationships model class-kw) [path :referencedType])))
+  "Returns a path as a strong"
+  ([model path & [exclude-root?]]
+   (reduce
+     (fn [total next]
+       (str total (if total " > ") (or (:displayName next) (:name next))))
+     nil
+     (if exclude-root? (rest (walk model path)) (walk model path)))))
