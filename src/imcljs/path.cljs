@@ -66,6 +66,16 @@
   (let [done (take-while #(does-not-contain? % :type) (walk model path))]
     (keyword (:name (last done)))))
 
+(defn class?
+  "Returns true if path is a class.
+  (class im-model `Gene.diseases`)
+  => true
+  (class im-model `Gene.diseases.name`)
+  => false"
+  [model path]
+  (let [walked (walk model path)]
+    (not (contains? (last walked) :type))))
+
 (defn trim-to-last-class
   "Returns a path string trimmed to the last class
   (trim-to-last-class im-model `Gene.homologues.homologue.symbol`)
