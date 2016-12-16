@@ -8,13 +8,13 @@
             [imcljs.save :as save]
             [imcljs.entity :as entity]))
 
-
-
-
-
 (enable-console-print!)
 
 (defn on-js-reload []
+
+  ; Everything in this fn is for testing and will go away when I figured out why
+  ; asynch events are misbehaving
+
   (def flymine {:root  "beta.flymine.org/beta"
                 :model {:name "genomic"}})
 
@@ -38,8 +38,6 @@
                           :op     "ISA"
                           :values ["Exon" "Intron" "Gene"]}]})
 
-
-
   (def bigr {:from   "SequenceFeature"
              :select ["SequenceFeature.id"
                       "SequenceFeature.name"
@@ -56,7 +54,6 @@
                       {:path  "SequenceFeature.organism.shortName"
                        :op    "="
                        :value "D. melanogaster"}]})
-
 
   (def ids-constraint-shortcut
     {:from   "Gene"
@@ -121,10 +118,7 @@
 
   ;(go
   ;  (let [model (<! (fetch/model flymine-beta))]
-  ;    (.log js/console "friendly" (path/walk model "Gene.microArrayResults.tissue.name"))))
-
-  ;
-
+  ;    (.log js/console "friendly" (path/data-type model "Gene.microArrayResults.tissue.name"))))
 
   ;(go
   ;  (let [fm (assoc flymine-beta :token (<! (fetch/session flymine-beta)))]
@@ -134,19 +128,12 @@
   ;  (let [fm (assoc flymine-beta :token (<! (fetch/session flymine-beta)))]
   ;    (.log js/console "D" (<! (save/im-list-copy fm "cookies" "cookies2")))))
 
-
   #_(go
       (.log js/console "d" (<! (fetch/table-rows flymine big-query {:start 50 :size 1}))))
-
-
-
-
-
 
   #_(go
       (let [model (<! (fetch/model flymine))]
         (.log js/console (fetch/table-rows flymine constraint-query))))
-
 
   ;(go
   ;  (let [fm (assoc flymine :token (<! (fetch/session flymine)))]
