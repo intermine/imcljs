@@ -2,14 +2,6 @@
   (:require [imcljs.internal.utils :refer [does-not-contain?]]
             [clojure.string :refer [split join]]))
 
-(def path-types
-  {nil                 :class
-   "java.lang.String"  :string
-   "java.lang.Boolean" :boolean
-   "java.lang.Integer" :integer
-   "java.lang.Double"  :double
-   "java.lang.Float"   :float})
-
 (defn split-path
   "Split a string path into a vector of keywords.
   (split-path `Gene.organism.shortName`)
@@ -22,12 +14,28 @@
   => Gene.organism.shortName"
   [path-str] (join "." (map name path-str)))
 
-(defn referenced-class
+(defn referenced-type
   "Given a model, a class, and a collection or reference, return the class of the collection or reference.
   (referenced-class im-model :Gene :homologues)
   => :Gene"
-  [model class-kw field-kw]
+  [model field-kw class-kw]
   (keyword (:referencedType (get (apply merge (map (get-in model [:classes class-kw]) [:references :collections])) field-kw))))
+
+(defn referenced-class
+  "Given a model, a reference/collection, and a class,
+  return the superclass of the reference/collection.
+  In the example :tissue is an attribute of the subclass :FlyAtlasResult
+  (referenced-class im-model :MicroArrayResult :tissue)
+  => :Tissue"
+  [model field-kw class-kw]
+  (.log js/console field-kw class-kw)
+  (->> (:classes model)
+       (filter (fn [[_ {:keys [extends]}]] (some (partial = class-kw) (map keyword extends))))
+       (map first)
+       (cons class-kw)
+       (map (partial referenced-type model field-kw))
+       (filter identity)
+       first))
 
 (defn is-attribute [class value]
   (get-in class [:attributes value]))
@@ -44,7 +52,7 @@
   ([model [class-kw & [path & remaining]] trail]
    (if-let [attribute (is-attribute (get-in model [:classes class-kw]) path)]
      (reduce conj trail [(get-in model [:classes class-kw]) attribute])
-     (if-let [class (referenced-class model class-kw path)]
+     (if-let [class (referenced-class model path class-kw)]
        (recur model (conj remaining class) (conj trail (get-in model [:classes class-kw])))
        (if-not path
          (if-let [final (get-in model [:classes class-kw])]
@@ -55,8 +63,7 @@
   (attribute-type im-model `Gene.organism.shortName`)
   => java.lang.String"
   [model path]
-  (if-let [walked (walk model path)]
-    (get path-types (:type (last walked)))))
+  (:type (last (walk model path))))
 
 (defn class
   "Returns the class represented by the path.

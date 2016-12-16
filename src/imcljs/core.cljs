@@ -119,10 +119,10 @@
      :select  ["Gene.symbol" "Gene.secondaryIdentifier"]
      :orderBy [{:symbol "asc"}]})
 
-
   ;(go
   ;  (let [model (<! (fetch/model flymine-beta))]
-  ;    (.log js/console "friendly" (path/friendly model "Gene.organism.name" true))))
+  ;    (.log js/console "friendly" (path/walk model "Gene.microArrayResults.tissue.name"))))
+
   ;
 
 
