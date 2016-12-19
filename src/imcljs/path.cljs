@@ -17,17 +17,13 @@
 (defn relationships
   "Given a model and a class, return its collections and references."
   [model class-kw]
-  ;(.log js/console "got relationships" class-kw)
-  ;(.log js/console "relationships returning" (apply merge (map (get-in model [:classes class-kw]) [:references :collections])))
-  (apply merge (map (get-in model [:classes class-kw]) [:references :collections])))
+  (map (get-in model [:classes class-kw]) [:references :collections]))
 
 (defn referenced-type
   "Given a model, a class, and a collection or reference, return the class of the collection or reference.
   (referenced-class im-model :Gene :homologues)
   => :Gene"
   [model field-kw class-kw]
-  ;(.log js/console "CHECKING REFERECNE TYPE" field-kw class-kw)
-  ;(.log js/console "RETURNED " (keyword (:referencedType (get (relationships model class-kw) field-kw))))
   (keyword (:referencedType (get (relationships model class-kw) field-kw))))
 
 (defn referenced-class
