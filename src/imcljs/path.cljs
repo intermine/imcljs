@@ -17,6 +17,8 @@
 (defn relationships
   "Given a model and a class, return its collections and references."
   [model class-kw]
+  ;(.log js/console "got relationships" class-kw)
+  ;(.log js/console "relationships returning" (apply merge (map (get-in model [:classes class-kw]) [:references :collections])))
   (apply merge (map (get-in model [:classes class-kw]) [:references :collections])))
 
 (defn referenced-type
@@ -24,6 +26,8 @@
   (referenced-class im-model :Gene :homologues)
   => :Gene"
   [model field-kw class-kw]
+  ;(.log js/console "CHECKING REFERECNE TYPE" field-kw class-kw)
+  ;(.log js/console "RETURNED " (keyword (:referencedType (get (relationships model class-kw) field-kw))))
   (keyword (:referencedType (get (relationships model class-kw) field-kw))))
 
 (defn referenced-class
@@ -44,6 +48,17 @@
 (defn is-attribute [class value]
   (get-in class [:attributes value]))
 
+(defn extended-class [model field-kw class-kw]
+  ; Given a field keyword and a class kw, return the class or subclass that has the field.
+  ; (extended-class model :affyCall :MicroArrayResult
+  ; => :FlyAtlasResult
+  (->> (:classes model)
+       (filter (fn [[_ {:keys [extends]}]] (some (partial = class-kw) (map keyword extends))))
+       (filter (fn [[_ class-details]]
+                 (get (apply merge (map class-details [:attributes :references :collections])) field-kw)))
+       first
+       first))
+
 (defn walk
   "Return a vector representing each part of path.
   If any part of the path is unresolvable then a nil is returned.
@@ -54,7 +69,7 @@
   ([model path]
    (walk model (if (string? path) (split-path path) path) []))
   ([model [class-kw & [path & remaining]] trail]
-   (if-let [attribute (is-attribute (get-in model [:classes class-kw]) path)]
+   (if-let [attribute (is-attribute (get-in model [:classes (extended-class model path class-kw)]) path)]
      (reduce conj trail [(get-in model [:classes class-kw]) attribute])
      (if-let [class (referenced-class model path class-kw)]
        (recur model (conj remaining class) (conj trail (get-in model [:classes class-kw])))

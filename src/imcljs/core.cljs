@@ -116,9 +116,12 @@
      :select  ["Gene.symbol" "Gene.secondaryIdentifier"]
      :orderBy [{:symbol "asc"}]})
 
-  ;(go
-  ;  (let [model (<! (fetch/model flymine-beta))]
-  ;    (.log js/console "friendly" (path/data-type model "Gene.microArrayResults.tissue.name"))))
+  ;Gene.downstreamIntergenicRegion.adjacentGenes.microArrayResults.affyCall
+  ;"Gene.downstreamIntergenicRegion.adjacentGenes.microArrayResults.affyCall"
+
+  (go
+    (let [model (<! (fetch/model flymine-beta))]
+      (.log js/console "walked" (path/walk model "Gene.downstreamIntergenicRegion.adjacentGenes.microArrayResults.affyCall"))))
 
   ;(go
   ;  (let [fm (assoc flymine-beta :token (<! (fetch/session flymine-beta)))]
