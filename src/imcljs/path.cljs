@@ -76,15 +76,22 @@
       {:name `Organism`, :collections {...} :attributes {...}
       {:name `shortName`, :type `java.lang.String`}]"
   ([model path]
-   (walk model (if (string? path) (split-path path) path) []))
+   (let [p (if (string? path) (split-path path) path)]
+     (if (= 1 (count p))
+       [(get-in model [:classes (first p)])]
+       (walk model p []))))
   ([model [class-kw & [path & remaining]] trail]
    (let [cv (class-value model class-kw path)]
      (if remaining
-       (if (contains? cv :referencedType)
+       (cond
+         (contains? cv :referencedType)
          (recur model
                 (cons (keyword (:referencedType cv)) remaining)
                 (conj trail (get-in model [:classes class-kw]))))
-       (conj trail (get-in model [:classes class-kw]) cv)))))
+       (conj trail (get-in model [:classes class-kw])
+             (if (contains? cv :referencedType)
+               (get-in model [:classes (keyword (:referencedType cv))])
+               cv))))))
 
 (defn data-type
   "Return the java type of a path representing an attribute.
@@ -98,8 +105,8 @@
   (class im-model `Gene.homologues.homologue.symbol`)
   => :Gene"
   [model path]
-  (let [done (take-while #(does-not-contain? % :type) (walk model path))]
-    (keyword (:name (last done)))))
+  (let [l (last (take-while #(does-not-contain? % :type) (walk model path)))]
+    (keyword (or (:referencedType l) (keyword (:name l))))))
 
 (defn class?
   "Returns true if path is a class.
@@ -117,7 +124,6 @@
   => Gene.homologues.homologue"
   [model path]
   (let [done (take-while #(does-not-contain? % :type) (walk model path))]
-    (.log js/console "DONE" path (walk model path))
     (join-path (take (count done) (split-path path)))))
 
 (defn friendly

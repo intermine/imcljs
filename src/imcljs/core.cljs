@@ -10,5 +10,4 @@
 
 (enable-console-print!)
 
-(defn on-js-reload []
-  (.log js/console "Reloading."))
+(defn on-js-reload [])
