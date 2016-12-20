@@ -17,13 +17,18 @@
 (defn relationships
   "Given a model and a class, return its collections and references."
   [model class-kw]
-  (map (get-in model [:classes class-kw]) [:references :collections]))
+  ;(.log js/console "RELS" (apply merge (map (get-in model [:classes class-kw]) [:references :collections])))
+  (apply merge (map (get-in model [:classes class-kw]) [:attributes :references :collections]))
+  ;(map (get-in model [:classes class-kw]) [:references :collections])
+  )
 
 (defn referenced-type
   "Given a model, a class, and a collection or reference, return the class of the collection or reference.
   (referenced-class im-model :Gene :homologues)
   => :Gene"
   [model field-kw class-kw]
+  ;(.log js/console "referenced-type given" field-kw class-kw)
+  ;(.log js/console "which produces" (keyword (:referencedType (get (relationships model class-kw) field-kw))))
   (keyword (:referencedType (get (relationships model class-kw) field-kw))))
 
 (defn referenced-class
@@ -41,18 +46,26 @@
        (filter identity)
        first))
 
-(defn is-attribute [class value]
-  (get-in class [:attributes value]))
+(defn referenced-values
+  "Given a model, a class, and a collection or reference, return the class of the collection or reference.
+  (referenced-class im-model :Gene :homologues)
+  => :Gene"
+  [model field-kw class-kw]
+  (get (relationships model class-kw) field-kw))
 
-(defn extended-class [model field-kw class-kw]
-  ; Given a field keyword and a class kw, return the class or subclass that has the field.
-  ; (extended-class model :affyCall :MicroArrayResult
-  ; => :FlyAtlasResult
+(defn class-value
+  "Given a model and a field, return that field from the data model.
+  A field can be a reference, a collection, or an attribute
+  In the example :tissue is an attribute of the subclass :FlyAtlasResult
+  (referenced-class im-model :MicroArrayResult :tissue)
+  => :Tissue"
+  [model class-kw field-kw]
   (->> (:classes model)
        (filter (fn [[_ {:keys [extends]}]] (some (partial = class-kw) (map keyword extends))))
-       (filter (fn [[_ class-details]]
-                 (get (apply merge (map class-details [:attributes :references :collections])) field-kw)))
-       first
+       (map first)
+       (cons class-kw)
+       (map (partial referenced-values model field-kw))
+       (filter identity)
        first))
 
 (defn walk
@@ -65,13 +78,13 @@
   ([model path]
    (walk model (if (string? path) (split-path path) path) []))
   ([model [class-kw & [path & remaining]] trail]
-   (if-let [attribute (is-attribute (get-in model [:classes (extended-class model path class-kw)]) path)]
-     (reduce conj trail [(get-in model [:classes class-kw]) attribute])
-     (if-let [class (referenced-class model path class-kw)]
-       (recur model (conj remaining class) (conj trail (get-in model [:classes class-kw])))
-       (if-not path
-         (if-let [final (get-in model [:classes class-kw])]
-           (conj trail final)))))))
+   (let [cv (class-value model class-kw path)]
+     (if remaining
+       (if (contains? cv :referencedType)
+         (recur model
+                (cons (keyword (:referencedType cv)) remaining)
+                (conj trail (get-in model [:classes class-kw]))))
+       (conj trail (get-in model [:classes class-kw]) cv)))))
 
 (defn data-type
   "Return the java type of a path representing an attribute.
@@ -104,6 +117,7 @@
   => Gene.homologues.homologue"
   [model path]
   (let [done (take-while #(does-not-contain? % :type) (walk model path))]
+    (.log js/console "DONE" path (walk model path))
     (join-path (take (count done) (split-path path)))))
 
 (defn friendly
