@@ -1,4 +1,5 @@
-(ns imcljs.internal.utils)
+(ns imcljs.internal.utils
+  (:require [clojure.string :refer [split]]))
 
 (def does-not-contain? (complement contains?))
 
@@ -10,7 +11,7 @@
 
 (defn append- [text val] (str val text))
 
-(def alphabet (apply sorted-set (clojure.string/split "ABCDEFGHIJKLMNOPQRSTUVWXYZ" "")))
+(def alphabet (apply sorted-set (split "ABCDEFGHIJKLMNOPQRSTUVWXYZ" "")))
 
 (defn scrub-url
   "Ensures that a url starts with an http protocol and ends with /service"
