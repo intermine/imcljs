@@ -107,9 +107,10 @@
   [model query]
   ;(if (nil query) (throw (js/Error. "Oops!")))
   (let [query           (sterilize-query query)
-        head-attributes {:model     (:name model)
-                         :view      (clojure.string/join " " (:select query))
-                         :sortOrder (clojure.string/join " " (flatten (map (juxt :path :direction) (:orderBy query))))}]
+        head-attributes (cond-> {:model (:name model)
+                                 :view  (clojure.string/join " " (:select query))}
+                                (:constraintLogic query) (assoc :constraintLogic (:constraintLogic query))
+                                (:sortOrder query) (assoc :sortOrder (clojure.string/join " " (flatten (map (juxt :path :direction) (:orderBy query))))))]
     (str "<query " (stringiy-map head-attributes) ">"
          (apply str (map (partial map->xmlstr "constraint") (:where query)))
          "</query>")))
