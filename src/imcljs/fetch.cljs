@@ -26,6 +26,10 @@
   [service query & [options]]
   (restful :post "/query/results" service (merge {:query query :format "count"} options)))
 
+(defn possible-values
+  [service path & [options]]
+  (restful :get "/path/values" service (merge {:path path :format "json"} options)))
+
 ; Assets
 
 (defn lists

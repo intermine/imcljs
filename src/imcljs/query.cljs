@@ -102,6 +102,8 @@
                        enforce-views-have-class
                        enforce-origin))
 
+
+
 (defn ->xml
   "Returns the stringfied XML representation of an EDN intermine query."
   [model query]
