@@ -14,13 +14,10 @@
   => Gene.organism.shortName"
   [path-str] (join "." (map name path-str)))
 
-(defn relationships
-  "Given a model and a class, return its collections and references."
+(defn properties
+  "Given a model and a class, return its attributes, references and collections."
   [model class-kw]
-  ;(.log js/console "RELS" (apply merge (map (get-in model [:classes class-kw]) [:references :collections])))
-  (apply merge (map (get-in model [:classes class-kw]) [:attributes :references :collections]))
-  ;(map (get-in model [:classes class-kw]) [:references :collections])
-  )
+  (apply merge (map (get-in model [:classes class-kw]) [:attributes :references :collections])))
 
 (defn referenced-type
   "Given a model, a class, and a collection or reference, return the class of the collection or reference.
@@ -28,8 +25,8 @@
   => :Gene"
   [model field-kw class-kw]
   ;(.log js/console "referenced-type given" field-kw class-kw)
-  ;(.log js/console "which produces" (keyword (:referencedType (get (relationships model class-kw) field-kw))))
-  (keyword (:referencedType (get (relationships model class-kw) field-kw))))
+  ;(.log js/console "which produces" (keyword (:referencedType (get (properties model class-kw) field-kw))))
+  (keyword (:referencedType (get (properties model class-kw) field-kw))))
 
 (defn referenced-class
   "Given a model, a reference/collection, and a class,
@@ -51,7 +48,7 @@
   (referenced-class im-model :Gene :homologues)
   => :Gene"
   [model field-kw class-kw]
-  (get (relationships model class-kw) field-kw))
+  (get (properties model class-kw) field-kw))
 
 (defn class-value
   "Given a model and a field, return that field from the data model.
@@ -108,6 +105,18 @@
   (let [l (last (take-while #(does-not-contain? % :type) (walk model path)))]
     (keyword (or (:referencedType l) (keyword (:name l))))))
 
+
+(defn relationships
+  "Returns all relationships (references and collections) for a given string path."
+  [model path]
+  (apply merge (map (get-in model [:classes (class model path)]) [:references :collections])))
+
+(defn attributes
+  "Returns all attributes for a given string path."
+  [model path]
+  (apply merge (map (get-in model [:classes (class model path)]) [:attributes])))
+
+
 (defn class?
   "Returns true if path is a class.
   (class im-model `Gene.diseases`)
@@ -134,3 +143,4 @@
        (str total (if total " > ") (or (:displayName next) (:name next))))
      nil
      (if exclude-root? (rest (walk model path)) (walk model path)))))
+
