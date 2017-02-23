@@ -144,3 +144,15 @@
      nil
      (if exclude-root? (rest (walk model path)) (walk model path)))))
 
+(defn one-of? [col value]
+  (some? (some #{value} col)))
+
+(defn subclasses
+  "Returns subclasses of the class"
+  [model path]
+  (let [path-class (class model path)]
+    (->> model
+         :classes
+         (filter (fn [[_ properties]] (one-of? (:extends properties) (name path-class))))
+         (map first)
+         not-empty)))
