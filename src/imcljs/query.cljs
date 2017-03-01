@@ -34,7 +34,7 @@
         m      (select-keys m [:path :value :values :type :op :code])
         values (:values m)]
 
-    (str "<" elem " "
+    (str "\n   <" elem " "
          (reduce (fn [total [k v]]
                    (if (not= k :values)
                      (str total (if total " ") (name k)
@@ -115,7 +115,7 @@
                                 (:sortOrder query) (assoc :sortOrder (clojure.string/join " " (flatten (map (juxt :path :direction) (:orderBy query))))))]
     (str "<query " (stringiy-map head-attributes) ">"
          (apply str (map (partial map->xmlstr "constraint") (:where query)))
-         "</query>")))
+         "\n</query>")))
 
 (defn deconstruct-by-class
   "Deconstructs a query by its views and groups them by class.

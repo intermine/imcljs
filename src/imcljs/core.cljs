@@ -14,13 +14,8 @@
               :model {:name "genomic"}})
 
 (defn on-js-reload []
-
-
-  (go (let [model (<! (fetch/model service))]
-        (let [rs (path/subclasses model "Gene.proteins")]
-          (.log js/console "sss" rs))))
-
-  )
+  (go
+    (let [model (<! (fetch/model service))])))
 
 
 
