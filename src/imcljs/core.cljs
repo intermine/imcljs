@@ -13,9 +13,13 @@
 (def service {:root  "beta.flymine.org/beta"
               :model {:name "genomic"}})
 
+(def query {:from "Gene" :select ["Gene.organism.name"]})
+
 (defn on-js-reload []
   (go
-    (let [model (<! (fetch/model service))])))
+    (let [model (<! (fetch/model service))]
+      #_(.log js/console "done"
+            (<! (fetch/unique-values service query 5))))))
 
 
 
