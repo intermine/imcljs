@@ -135,6 +135,17 @@
   (let [done (take-while #(does-not-contain? % :type) (walk model path))]
     (join-path (take (count done) (split-path path)))))
 
+(defn adjust-path-to-last-class
+  "Returns a path adjusted to its last class
+  (adjust-path-to-last-class im-model `Gene.organism.name`)
+  => Organism.name"
+  [model path]
+  (let [attribute? (not (class? model path))
+        walked (reverse (walk model path))]
+    (if attribute?
+      (str (:name (nth walked 1)) "." (:name (nth walked 0)))
+      (str (:name (nth walked 0))))))
+
 (defn friendly
   "Returns a path as a strong"
   ([model path & [exclude-root?]]

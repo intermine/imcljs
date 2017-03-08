@@ -6,7 +6,8 @@
             [imcljs.path :as path]
             [imcljs.query :as query]
             [imcljs.save :as save]
-            [imcljs.entity :as entity]))
+            [imcljs.entity :as entity]
+            [imcljs.logic :as logic]))
 
 (enable-console-print!)
 
@@ -18,8 +19,7 @@
 (defn on-js-reload []
   (go
     (let [model (<! (fetch/model service))]
-      #_(.log js/console "done"
-            (<! (fetch/unique-values service query 5))))))
+      (println "adjusted" (path/adjust-path-to-last-class model "Gene.organism.name")))))
 
 
 
