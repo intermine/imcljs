@@ -6,8 +6,7 @@
             [imcljs.path :as path]
             [imcljs.query :as query]
             [imcljs.save :as save]
-            [imcljs.entity :as entity]
-            [imcljs.logic :as logic]))
+            [imcljs.entity :as entity]))
 
 (enable-console-print!)
 
