@@ -1,5 +1,7 @@
 (ns imcljs.fetch
-  (:require [imcljs.internal.io :refer [restful]]))
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require [imcljs.internal.io :refer [restful]]
+            [cljs.core.async :refer [<! >! chan]]))
 
 ; Quicksearch
 
@@ -29,6 +31,22 @@
 (defn row-count
   [service query & [options]]
   (restful :post "/query/results" service (merge {:query query :format "count"} options)))
+
+(defn possible-values
+  [service path & [options]]
+  (restful :get "/path/values" service (merge {:path path :format "json"} options)))
+
+(defn unique-values
+  "Fetches unique values for a path within a query. Providing a limit shortcircuits the request
+  and returns false if the unique values exceed the limit"
+  [service query path & [limit]]
+  (let [return-chan (chan)]
+    (go
+      (let [{unique-count :uniqueValues} (<! (rows service query {:summaryPath path :size 1 :format "jsonrows"}))]
+        (if (or (not limit) (<= unique-count limit))
+          (>! return-chan (<! (rows service query {:summaryPath path :size limit :format "jsonrows"})))
+          (>! return-chan false))))
+    return-chan))
 
 ; Assets
 

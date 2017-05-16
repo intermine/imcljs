@@ -26,3 +26,4 @@ out
 .lein-*
 /resources/public/js
 /resources/public/js/test
+node_modules/

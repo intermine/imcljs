@@ -1,5 +1,7 @@
 # imcljs
 
+[![Build Status](https://travis-ci.org/intermine/imcljs.svg?branch=master)](https://travis-ci.org/intermine/imcljs)
+
 A library for interacting with Intermine's web services.
 
 ## Getting Start

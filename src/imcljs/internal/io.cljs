@@ -54,13 +54,13 @@
 
 (defmethod restful :post [method path service options & [xform]]
   ;(body- (post-wrapper- path service options) xform)
-  (post-wrapper- path service options xform)
-  )
+  (post-wrapper- path service options xform))
+
 
 (defmethod restful :get [method path service options & [xform]]
   ;(body- (request-wrapper- path service options) xform)
-  (request-wrapper- path service options xform)
-  )
+  (request-wrapper- path service options xform))
+
 
 (defmethod restful :delete [method path service options & [xform]]
   (delete-wrapper- path service options xform))

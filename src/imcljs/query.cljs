@@ -34,7 +34,7 @@
         m      (select-keys m [:path :value :values :type :op :code])
         values (:values m)]
 
-    (str "<" elem " "
+    (str "\n   <" elem " "
          (reduce (fn [total [k v]]
                    (if (not= k :values)
                      (str total (if total " ") (name k)
@@ -102,17 +102,20 @@
                        enforce-views-have-class
                        enforce-origin))
 
+
+
 (defn ->xml
   "Returns the stringfied XML representation of an EDN intermine query."
   [model query]
   ;(if (nil query) (throw (js/Error. "Oops!")))
   (let [query           (sterilize-query query)
-        head-attributes {:model     (:name model)
-                         :view      (clojure.string/join " " (:select query))
-                         :sortOrder (clojure.string/join " " (flatten (map (juxt :path :direction) (:orderBy query))))}]
+        head-attributes (cond-> {:model (:name model)
+                                 :view  (clojure.string/join " " (:select query))}
+                                (:constraintLogic query) (assoc :constraintLogic (:constraintLogic query))
+                                (:sortOrder query) (assoc :sortOrder (clojure.string/join " " (flatten (map (juxt :path :direction) (:orderBy query))))))]
     (str "<query " (stringiy-map head-attributes) ">"
          (apply str (map (partial map->xmlstr "constraint") (:where query)))
-         "</query>")))
+         "\n</query>")))
 
 (defn deconstruct-by-class
   "Deconstructs a query by its views and groups them by class.
