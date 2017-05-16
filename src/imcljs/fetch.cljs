@@ -16,6 +16,10 @@
   [service query & [options]]
   (restful :post "/query/results/tablerows" service (merge {:query query} options)))
 
+(defn fasta
+  [service query & [options]]
+  (restful :post "/query/results/fasta" service (merge {:query query} options)))
+
 (defn records
   [service query & [options]]
   (restful :post "/query/results" service (merge {:query query :format "jsonobjects"} options)))
