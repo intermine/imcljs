@@ -1,5 +1,6 @@
 (ns imcljs.internal.defaults
-  (:require [cljs.core.async :refer [chan]]
+  (:require #?(:cljs [cljs.core.async :refer [chan]]
+               :clj [clojure.core.async :refer [chan]])
             [imcljs.query :refer [->xml]]
             [imcljs.internal.utils :refer [scrub-url]]))
 
@@ -18,9 +19,18 @@
 (defn wrap-accept [request-map]
   (assoc-in request-map [:headers "accept"] "application/json"))
 
+(defn transform-if-successful
+  ; If our request was successful then perform the transformation function
+  ; otherwise return the raw result with a status code
+  [xform]
+  (fn [request]
+    (if (>= (:status request) 400)
+      request
+      (-> request :body xform))))
+
 (defn wrap-request-defaults [m & [xform]]
   (assoc m :with-credentials? false
-           :channel (chan 1 (map (if xform (comp xform :body) :body)))))
+           :channel (chan 1 (map (if xform (transform-if-successful xform) :body)))))
 
 (defn wrap-post-defaults [request options & [model]]
   (assoc request :form-params (cond-> options
