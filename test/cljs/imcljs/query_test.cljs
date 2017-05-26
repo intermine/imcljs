@@ -13,7 +13,8 @@
                    :select ["Gene.symbol" "Gene.organism.name" "Gene.homologues.homologue.symbol"]
                    :where  [{:path  "Gene.symbol"
                              :op    "="
-                             :value "mad"}]})
+                             :value "mad"
+                             :code "A"}]})
 
 (deftest deconstruct-by-class
   (testing "Should be able to deconstruct a query into its classes"

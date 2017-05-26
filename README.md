@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/intermine/imcljs.svg?branch=master)](https://travis-ci.org/intermine/imcljs)
 
-A library for interacting with Intermine's web services.
+A Clojure/ClojureScript library for interacting with Intermine's web services.
 
 ## Getting Start
 
@@ -21,11 +21,11 @@ All imcljs funtions expect a map as their first parameter containing a mandtory 
 ```clj
 (def flymine {:root  "www.flymine.org/query"
               :token nil ; Optional parameter for authentication
-              :model nil ; Required by some functions, such as executing a query
+              :model "genomic" ; Required by some functions, such as executing a query
               })
 ```
 
-We recommend fetching the `model` once and storing the above map for re-use across your application.
+We recommend fetching the `model` once and storing it in the above map for re-use across your application.
 
 ## Examples
 

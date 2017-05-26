@@ -11,7 +11,7 @@
 
 (defn append- [text val] (str val text))
 
-(def alphabet (apply sorted-set (split "ABCDEFGHIJKLMNOPQRSTUVWXYZ" "")))
+(def alphabet (apply sorted-set (split "ABCDEFGHIJKLMNOPQRSTUVWXYZ" #"")))
 
 (defn scrub-url
   "Ensures that a url starts with an http protocol and ends with /service"

@@ -1,7 +1,8 @@
 (ns imcljs.fetch
-  (:require-macros [cljs.core.async.macros :refer [go]])
+  #?(:cljs (:require-macros [cljs.core.async.macros :refer [go]]))
   (:require [imcljs.internal.io :refer [restful]]
-            [cljs.core.async :refer [<! >! chan]]))
+    #?(:cljs [cljs.core.async :refer [<! >! chan]]
+       :clj [clojure.core.async :refer [<! >! go chan]])))
 
 ; Quicksearch
 

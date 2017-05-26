@@ -1,4 +1,4 @@
-(defproject intermine/imcljs "0.1.15-SNAPSHOT"
+(defproject intermine/imcljs "0.1.16-SNAPSHOT"
   :description "imcljs"
   :license {:name "Eclipse Public License"
             :url  "http://www.eclipse.org/legal/epl-v10.html"}
@@ -8,13 +8,14 @@
   :dependencies [[org.clojure/clojure "1.9.0-alpha13"]
                  [org.clojure/clojurescript "1.9.293"]
                  [org.clojure/core.async "0.2.395" :exclusions [org.clojure/tools.reader]]
-                 [cljs-http "0.1.42"]]
+                 [cljs-http "0.1.42"]
+                 [clj-http "3.6.0"]]
 
   :plugins [[lein-figwheel "0.5.8"]
             [lein-cljsbuild "1.1.4" :exclusions [[org.clojure/clojure]]]
             [lein-doo "0.1.7"]]
 
-  :source-paths ["src"]
+  :source-paths ["src/cljc" "src/cljs"]
 
   :figwheel {:server-port 5003}
 
@@ -26,7 +27,7 @@
 
   :cljsbuild {:builds
               [{:id           "dev"
-                :source-paths ["src"]
+                :source-paths ["src/cljc" "src/cljs"]
                 :figwheel     {:on-jsload "imcljs.core/on-js-reload"
                                :open-urls ["http://localhost:5003/index.html"]}
                 :compiler     {:main                 imcljs.core
@@ -36,7 +37,7 @@
                                :source-map-timestamp true
                                :preloads             [devtools.preload]}}
                {:id           "min"
-                :source-paths ["src"]
+                :source-paths ["src/cljc" "src/cljs"]
                 :compiler     {:output-to     "resources/public/js/compiled/imcljs.js"
                                :main          imcljs.core
                                :optimizations :advanced

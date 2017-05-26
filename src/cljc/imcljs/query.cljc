@@ -52,7 +52,7 @@
 
 (defn enforce-origin [query]
   (if (nil? (:from query))
-    (assoc query :from (first (clojure.string/split (first (:select query)) ".")))
+    (assoc query :from (first (clojure.string/split (first (:select query)) #"\.")))
     query))
 
 (defn enforce-views-have-class [query]
@@ -60,7 +60,7 @@
           (partial mapv
                    (fn [path]
                      (let [path (name path)]
-                       (if (= (:from query) (first (clojure.string/split path ".")))
+                       (if (= (:from query) (first (clojure.string/split path #"\.")))
                          path
                          (str (:from query) "." path)))))))
 
@@ -69,7 +69,7 @@
           (partial mapv
                    (fn [constraint]
                      (let [path (:path constraint)]
-                       (if (= (:from query) (first (clojure.string/split path ".")))
+                       (if (= (:from query) (first (clojure.string/split path #"\.")))
                          constraint
                          (assoc constraint :path (str (:from query) "." path))))))))
 
@@ -91,7 +91,7 @@
                                    {:path      (str (name (first (first (seq order)))))
                                     :direction (second (first (seq order)))}
                                    order)]
-                       (if (= (:from query) (first (clojure.string/split (:path order) ".")))
+                       (if (= (:from query) (first (clojure.string/split (:path order) #"\.")))
                          order
                          (assoc order :path (str (:from query) "." (:path order)))))))))
 

@@ -6,7 +6,7 @@
   "Split a string path into a vector of keywords.
   (split-path `Gene.organism.shortName`)
   => [:Gene :organism :shortName]"
-  [path-str] (map keyword (split path-str ".")))
+  [path-str] (map keyword (split path-str #"\.")))
 
 (defn join-path
   "Join a vector path of keywords to a string.
