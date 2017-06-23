@@ -12,4 +12,4 @@
 (defn who-am-i?
   "Given a token return user information"
   [service token & [options]]
-  (restful :get "/user/whoami" service {:token token} options :user))
+  (restful :get "/user/whoami" service (merge {:token token} options) :user))
