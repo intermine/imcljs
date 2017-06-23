@@ -21,6 +21,11 @@
   [service query & [options]]
   (restful :post "/query/results/fasta" service (merge {:query query} options)))
 
+(defn fetch-custom-format
+  ;;e.g. csv, tsv formats.
+  [service query & [options]]
+  (restful :post "/query/results" service (merge {:query query} options)))
+
 (defn records
   [service query & [options]]
   (restful :post "/query/results" service (merge {:query query :format "jsonobjects"} options)))
