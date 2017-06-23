@@ -6,15 +6,15 @@
             [imcljs.path :as path]
             [imcljs.query :as query]
             [imcljs.save :as save]
-            [imcljs.entity :as entity]))
+            [imcljs.entity :as entity]
+            [imcljs.auth :as auth]))
 
 (enable-console-print!)
 
-(def service {:root "beta.flymine.org/beta"
+(def service {:root "www.flymine.org/flymine"
               :model {:name "genomic"}})
 
 (def simple-query {:from "Gene" :select ["Gene.organism.name"]})
-
 
 (def complicated-query {:from "Gene",
                         :select ["Gene.symbol"
