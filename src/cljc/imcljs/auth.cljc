@@ -8,3 +8,8 @@
   "Given a username and a password return an API token"
   [service username password]
   (restful :basic-auth "/user/token" service {:username username :password password} :token))
+
+(defn who-am-i?
+  "Given a token return user information"
+  [service token & [options]]
+  (restful :get "/user/whoami" service {:token token} options :user))

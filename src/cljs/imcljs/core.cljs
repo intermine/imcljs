@@ -11,7 +11,7 @@
 
 (enable-console-print!)
 
-(def service {:root "www.flymine.org/flymine"
+(def service {:root "beta.flymine.org/beta"
               :model {:name "genomic"}})
 
 (def simple-query {:from "Gene" :select ["Gene.organism.name"]})
@@ -29,8 +29,7 @@
 
 (defn on-js-reload []
   (go
-    (let [model (<! (fetch/model service))]
-      (.log js/console "done" (query/deconstruct-by-class model complicated-query)))))
+    (let [model (<! (fetch/model service))])))
 
 
 
