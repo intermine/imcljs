@@ -1,6 +1,6 @@
 (ns imcljs.query
   (:require [imcljs.path :as path]
-            [clojure.string :refer [join]]
+            [clojure.string :refer [join blank?]]
             [clojure.set :refer [difference]]
             [imcljs.internal.utils :refer [alphabet]]))
 
@@ -79,9 +79,10 @@
             (reduce (fn [total {:keys [code] :as constraint}]
                       (if (some? code)
                         (conj total constraint)
-                        (let [existing-codes      (set (remove nil? (concat (map :code constraints) (map :code total))))
-                              next-available-code (first (difference alphabet existing-codes))]
+                        (let [existing-codes (set (remove nil? (concat (map :code constraints) (map :code total))))
+                              next-available-code (first (filter (complement blank?) (difference alphabet existing-codes)))]
                           (conj total (assoc constraint :code next-available-code))))) [] constraints))))
+
 
 (defn enforce-sorting [query]
   (update query :orderBy

@@ -27,6 +27,14 @@
                                 {:path "Gene.symbol", :value "mad", :op "=", :code "B"}],
                         :orderBy '()})
 
+(def test-code {:from "Gene",
+                        :select ["Gene.symbol"
+                                 "Gene.organism.name"
+                                 "Gene.alleles.symbol"
+                                 "Gene.alleles.phenotypeAnnotations.annotationType"
+                                 "Gene.alleles.phenotypeAnnotations.description"],
+                        :where [{:path "Gene.symbol", :value "zen", :op "="}]})
+
 (defn on-js-reload []
   (go
     (let [model (<! (fetch/model service))])))
