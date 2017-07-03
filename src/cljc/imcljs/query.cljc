@@ -21,17 +21,17 @@
       (assoc :op "ONE OF")
       (update :path add-id)))
 
-(def html-entities {"<"  "&lt;"
+(def html-entities {"<" "&lt;"
                     "<=" "&lt;="
-                    ">"  "&gt;"
+                    ">" "&gt;"
                     ">=" "&gt;="})
 
 (defn map->xmlstr
   "xml string representation of an edn map.
   (map->xlmstr constraint {:key1 val1 key2 val2}) => <constraint key1=val1 key2=val2 />"
   [elem m]
-  (let [m      (cond-> m (contains? m :ids) ids->constraint)
-        m      (select-keys m [:path :value :values :type :op :code])
+  (let [m (cond-> m (contains? m :ids) ids->constraint)
+        m (select-keys m [:path :value :values :type :op :code])
         values (:values m)]
 
     (str "\n   <" elem " "
@@ -64,6 +64,17 @@
                          path
                          (str (:from query) "." path)))))))
 
+(defn enforce-joins-have-class [query]
+  (if (contains? query :joins)
+    (update query :joins
+            (partial mapv
+                     (fn [path]
+                       (let [path (name path)]
+                         (if (= (:from query) (first (clojure.string/split path #"\.")))
+                           path
+                           (str (:from query) "." path))))))
+    query))
+
 (defn enforce-constraints-have-class [query]
   (update query :where
           (partial mapv
@@ -89,7 +100,7 @@
           (partial map
                    (fn [order]
                      (let [order (if (nil? (:path order))
-                                   {:path      (str (name (first (first (seq order)))))
+                                   {:path (str (name (first (first (seq order)))))
                                     :direction (second (first (seq order)))}
                                    order)]
                        (if (= (:from query) (first (clojure.string/split (:path order) #"\.")))
@@ -100,21 +111,25 @@
                        enforce-sorting
                        enforce-constraints-have-class
                        enforce-constraints-have-code
+                       enforce-joins-have-class
                        enforce-views-have-class
                        enforce-origin))
 
-
+(defn make-join [join-path] (str "\n  <join path=\"" join-path "\" style=\"OUTER\"/>"))
 
 (defn ->xml
   "Returns the stringfied XML representation of an EDN intermine query."
   [model query]
   ;(if (nil query) (throw (js/Error. "Oops!")))
-  (let [query           (sterilize-query query)
+
+  (let [query (sterilize-query query)
         head-attributes (cond-> {:model (:name model)
-                                 :view  (clojure.string/join " " (:select query))}
+                                 :view (clojure.string/join " " (:select query))}
                                 (:constraintLogic query) (assoc :constraintLogic (:constraintLogic query))
                                 (:sortOrder query) (assoc :sortOrder (clojure.string/join " " (flatten (map (juxt :path :direction) (:orderBy query))))))]
     (str "<query " (stringiy-map head-attributes) ">"
+         (when (:joins query) (apply str (map make-join (:joins query))))
+
          (apply str (map (partial map->xmlstr "constraint") (:where query)))
          "\n</query>")))
 

@@ -6,7 +6,7 @@
             [imcljs.fetch :as fetch]
             [imcljs.query :as query]))
 
-(def service {:root  "beta.flymine.org/beta"
+(def service {:root  "www.flymine.org/query"
               :model {:name "genomic"}})
 
 (def normal-query {:from   "Gene"
@@ -15,6 +15,46 @@
                              :op    "="
                              :value "mad"
                              :code "A"}]})
+
+(def outer-join-query {:constraintLogic "B and C"
+                       :from "Gene"
+                       :select [
+                                "secondaryIdentifier"
+                                "symbol"
+                                "homologues.homologue.primaryIdentifier"
+                                "homologues.homologue.symbol"
+                                "homologues.type"
+                                "homologues.homologue.organism.name"
+                                "homologues.dataSets.name"
+                                "homologues.homologue.goAnnotation.ontologyTerm.name"
+                                "homologues.homologue.goAnnotation.evidence.code.code"
+                                ]
+                       :joins ["homologues.homologue.goAnnotation"]
+                       :where [{:path "Gene",
+                                :op "LOOKUP",
+                                :value "CG6235",
+                                :extraValue "D. melanogaster",
+                                :code "B",
+                                :editable true,
+                                :switched "LOCKED",
+                                :switachable false
+                                }
+                               {
+                                :path "homologues.homologue.organism.name",
+                                :op "=",
+                                :value "Anopheles gambiae",
+                                :code "C",
+                                :editable true,
+                                :switched "LOCKED",
+                                :switchable false}]})
+
+(deftest outer-join
+  (testing "Query support for outer joins"
+    (async done
+      (go
+        (let [{results :results} (<! (fetch/table-rows service outer-join-query))]
+          (is (some? (not-empty results)))
+          (done))))))
 
 (deftest deconstruct-by-class
   (testing "Should be able to deconstruct a query into its classes"
