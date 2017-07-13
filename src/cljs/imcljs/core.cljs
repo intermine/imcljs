@@ -38,9 +38,7 @@
 
 (defn on-js-reload []
   (go
-    (let [model (<! (fetch/model service))]
-      (.log js/console "model" model)
-      (.log js/console (path/walk model "Gene.microArrayResults.mRNASignalSEM") ))))
+    (let [model (<! (fetch/model service))])))
 
 
 
