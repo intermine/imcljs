@@ -5,7 +5,7 @@
             [imcljs.path :as path]
             [imcljs.fetch :as fetch]))
 
-(def service {:root  "beta.flymine.org/beta"
+(def service {:root  "www.flymine.org/query"
               :model {:name "genomic"}})
 
 (deftest walk-subclass
