@@ -1,4 +1,4 @@
-(defproject intermine/imcljs "0.1.22"
+(defproject intermine/imcljs "0.1.23"
   :description "imcljs"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
@@ -19,7 +19,8 @@
 
   :source-paths ["src/cljc" "src/cljs"]
 
-  :figwheel {:server-port 5003}
+  :figwheel {:server-port 5003
+             :reload-clj-files {:clj true :cljc true}}
 
   :doo {:build "test"
         :paths {:phantom "phantomjs --web-security=false"}

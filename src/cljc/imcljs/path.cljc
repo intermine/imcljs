@@ -89,7 +89,6 @@
              (if (contains? cv :referencedType)
                (get-in model [:classes (keyword (:referencedType cv))])
                cv))))))
-
 (defn data-type
   "Return the java type of a path representing an attribute.
   (attribute-type im-model `Gene.organism.shortName`)
@@ -110,6 +109,23 @@
   "Returns all relationships (references and collections) for a given string path."
   [model path]
   (apply merge (map (get-in model [:classes (class model path)]) [:references :collections])))
+
+(defn mapify [coll]
+  (into {} coll))
+
+(defn display-name
+  "Returns a vector of friendly names representing the path
+  ; TODO make this work with subclasses"
+  ([model path]
+   (let [p (if (string? path) (split-path path) path)]
+     (display-name model p [(get-in model [:classes (first p) :displayName])])))
+  ([model [head next & tail] collected]
+   (if next
+     (let [props (-> model (get-in [:classes head]) (select-keys [:attributes :references :collections]) vals mapify)
+           collected-and-this (conj collected (get-in props [next :displayName]))]
+       (if (not-empty tail)
+         (recur model (conj tail (keyword (get-in props [next :referencedType]))) collected-and-this)
+         collected-and-this)))))
 
 (defn attributes
   "Returns all attributes for a given string path."
@@ -141,7 +157,7 @@
   => Organism.name"
   [model path]
   (let [attribute? (not (class? model path))
-        walked (reverse (walk model path))]
+        walked     (reverse (walk model path))]
     (if attribute?
       (str (:name (nth walked 1)) "." (:name (nth walked 0)))
       (str (:name (nth walked 0))))))
