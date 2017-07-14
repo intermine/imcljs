@@ -11,7 +11,7 @@
 
 (enable-console-print!)
 
-(def service {:root "www.flymine.org/query"
+(def service {:root "yeastmine.yeastgenome.org/yeastmine"
               :model {:name "genomic"}})
 
 (def simple-query {:from "Gene" :select ["Gene.organism.name"]})
@@ -35,6 +35,7 @@
                          "Gene.alleles.phenotypeAnnotations.annotationType"
                          "Gene.alleles.phenotypeAnnotations.description"],
                 :where [{:path "Gene.symbol", :value "zen", :op "="}]})
+
 
 (defn on-js-reload []
   (go
