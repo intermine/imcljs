@@ -113,19 +113,33 @@
 (defn mapify [coll]
   (into {} coll))
 
+(defn un-camel-case [s]
+  (-> s
+      (clojure.string/replace #"([a-z])([A-Z])" "$1 $2")
+      (clojure.string/replace #"([A-Z])([a-z])" " $1$2")
+      (clojure.string/replace #"\ +" " ")
+      (clojure.string/replace #"^." #(clojure.string/upper-case %))))
+
+(defn display-name-fallback
+  [model path]
+  (map (fn [c] (or (:displayName c) (un-camel-case (:name c)))) (walk model path)))
+
 (defn display-name
   "Returns a vector of friendly names representing the path
   ; TODO make this work with subclasses"
   ([model path]
    (let [p (if (string? path) (split-path path) path)]
-     (display-name model p [(get-in model [:classes (first p) :displayName])])))
+     (let [finished (display-name model p [(get-in model [:classes (first p) :displayName])])]
+       (if-not (every? some? finished)
+         (display-name-fallback model path)
+         finished))))
   ([model [head next & tail] collected]
    (if next
-     (let [props (-> model (get-in [:classes head]) (select-keys [:attributes :references :collections]) vals mapify)
-           collected-and-this (conj collected (get-in props [next :displayName]))]
+     (let [props      (-> model (get-in [:classes head]) (select-keys [:attributes :references :collections]) vals mapify)
+           collected+ (conj collected (get-in props [next :displayName]))]
        (if (not-empty tail)
-         (recur model (conj tail (keyword (get-in props [next :referencedType]))) collected-and-this)
-         collected-and-this)))))
+         (recur model (conj tail (keyword (get-in props [next :referencedType]))) collected+)
+         collected+)))))
 
 (defn attributes
   "Returns all attributes for a given string path."

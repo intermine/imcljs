@@ -1,4 +1,4 @@
-(defproject intermine/imcljs "0.1.23"
+(defproject intermine/imcljs "0.1.24"
   :description "imcljs"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
@@ -7,14 +7,14 @@
 
   :deploy-repositories {"clojars" {:sign-releases false}}
 
-  :dependencies [[org.clojure/clojure "1.9.0-alpha13"]
-                 [org.clojure/clojurescript "1.9.293"]
-                 [org.clojure/core.async "0.2.395" :exclusions [org.clojure/tools.reader]]
+  :dependencies [[org.clojure/clojure "1.9.0-alpha17"]
+                 [org.clojure/clojurescript "1.9.671"]
+                 [org.clojure/core.async "0.3.443"]
                  [cljs-http "0.1.42"]
                  [clj-http "3.6.0"]]
 
   :plugins [[lein-figwheel "0.5.8"]
-            [lein-cljsbuild "1.1.4" :exclusions [[org.clojure/clojure]]]
+            [lein-cljsbuild "1.1.6" :exclusions [[org.clojure/clojure]]]
             [lein-doo "0.1.7"]]
 
   :source-paths ["src/cljc" "src/cljs"]
