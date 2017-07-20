@@ -52,10 +52,7 @@
 
 (defn on-js-reload []
   (go
-    (let [model (<! (fetch/model service))]
-      (.log js/console "sterile" (query/sterilize-query simple-query))
-      (.log js/console "xml" (query/->xml {:name "genomic"} simple-query))
-      (.log js/console "sort" (<! (fetch/rows service simple-query))))))
+    (let [model (<! (fetch/model service))])))
 
 
 
