@@ -96,7 +96,7 @@
 
 
 (defn enforce-sorting [query]
-  (update query :orderBy
+  (update query :sortOrder
           (partial map
                    (fn [order]
                      (let [order (if (nil? (:path order))
@@ -126,7 +126,7 @@
         head-attributes (cond-> {:model (:name model)
                                  :view (clojure.string/join " " (:select query))}
                                 (:constraintLogic query) (assoc :constraintLogic (:constraintLogic query))
-                                (:sortOrder query) (assoc :sortOrder (clojure.string/join " " (flatten (map (juxt :path :direction) (:orderBy query))))))]
+                                (:sortOrder query) (assoc :sortOrder (clojure.string/join " " (flatten (map (juxt :path :direction) (:sortOrder query))))))]
     (str "<query " (stringiy-map head-attributes) ">"
          (when (:joins query) (apply str (map make-join (:joins query))))
 

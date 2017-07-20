@@ -11,10 +11,24 @@
 
 (enable-console-print!)
 
-(def service {:root "yeastmine.yeastgenome.org/yeastmine"
+(def service {:root "www.flymine.org/query"
               :model {:name "genomic"}})
 
-(def simple-query {:from "Gene" :select ["Gene.organism.name"]})
+(def simple-query {:from "Gene" :select ["Gene.organism.name"] :size 10})
+
+(def outer-join-query {:from "Gene"
+                       :select ["primaryIdentifier"
+                                "secondaryIdentifier"
+                                "symbol"
+                                "publications.year"]
+                       :joins ["publications"]
+                       :size 10
+                       :sortOrder [{:path "symbol"
+                                    :direction "ASC"}]
+                       :where [{:path "secondaryIdentifier"
+                                :op "="
+                                :value "AC3.1*" ;AC3*
+                                :code "A"}]})
 
 (def complicated-query {:from "Gene",
                         :select ["Gene.symbol"
@@ -27,7 +41,6 @@
                                 {:path "Gene.symbol", :value "mad", :op "=", :code "B"}],
                         :orderBy '()})
 
-
 (def test-code {:from "Gene",
                 :select ["Gene.symbol"
                          "Gene.organism.name"
@@ -39,7 +52,10 @@
 
 (defn on-js-reload []
   (go
-    (let [model (<! (fetch/model service))])))
+    (let [model (<! (fetch/model service))]
+      (.log js/console "sterile" (query/sterilize-query simple-query))
+      (.log js/console "xml" (query/->xml {:name "genomic"} simple-query))
+      (.log js/console "sort" (<! (fetch/rows service simple-query))))))
 
 
 

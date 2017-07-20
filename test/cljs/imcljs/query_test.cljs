@@ -6,15 +6,15 @@
             [imcljs.fetch :as fetch]
             [imcljs.query :as query]))
 
-(def service {:root  "www.flymine.org/query"
+(def service {:root "www.flymine.org/query"
               :model {:name "genomic"}})
 
-(def normal-query {:from   "Gene"
+(def normal-query {:from "Gene"
                    :select ["Gene.symbol" "Gene.organism.name" "Gene.homologues.homologue.symbol"]
-                   :where  [{:path  "Gene.symbol"
-                             :op    "="
-                             :value "mad"
-                             :code "A"}]})
+                   :where [{:path "Gene.symbol"
+                            :op "="
+                            :value "mad"
+                            :code "A"}]})
 
 (def outer-join-query {:constraintLogic "B and C"
                        :from "Gene"
@@ -65,23 +65,18 @@
             (is (= result {:Gene
                            {"Gene.homologues.homologue"
                             {:query
-                             {:where   [{:path "Gene.symbol", :value "mad", :op "=", :code "A"}]
-                              :from    "Gene"
-                              :select  ["Gene.homologues.homologue.id"]
-                              :orderBy '()}}
+                             {:where [{:path "Gene.symbol", :value "mad", :op "=", :code "A"}]
+                              :from "Gene"
+                              :select ["Gene.homologues.homologue.id"]}}
                             "Gene"
                             {:query
-                             {:where   [{:path "Gene.symbol", :value "mad", :op "=", :code "A"}]
-                              :from    "Gene"
-                              :select  ["Gene.id"]
-                              :orderBy '()}}}
+                             {:where [{:path "Gene.symbol", :value "mad", :op "=", :code "A"}]
+                              :from "Gene"
+                              :select ["Gene.id"]}}}
                            :Organism
                            {"Gene.organism"
                             {:query
-                             {:where   [{:path "Gene.symbol", :value "mad", :op "=", :code "A"}]
-                              :from    "Gene"
-                              :select  ["Gene.organism.id"]
-                              :orderBy '()}}}}))
+                             {:where [{:path "Gene.symbol", :value "mad", :op "=", :code "A"}]
+                              :from "Gene"
+                              :select ["Gene.organism.id"]}}}}))
             (done)))))))
-
-
