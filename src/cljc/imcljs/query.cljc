@@ -76,36 +76,42 @@
     query))
 
 (defn enforce-constraints-have-class [query]
-  (update query :where
-          (partial mapv
-                   (fn [constraint]
-                     (let [path (:path constraint)]
-                       (if (= (:from query) (first (clojure.string/split path #"\.")))
-                         constraint
-                         (assoc constraint :path (str (:from query) "." path))))))))
+  (if (contains? query :where)
+    (update query :where
+           (partial mapv
+                    (fn [constraint]
+                      (let [path (:path constraint)]
+                        (if (= (:from query) (first (clojure.string/split path #"\.")))
+                          constraint
+                          (assoc constraint :path (str (:from query) "." path)))))))
+    query))
 
 (defn enforce-constraints-have-code [query]
-  (update query :where
-          (fn [constraints]
-            (reduce (fn [total {:keys [code] :as constraint}]
-                      (if (some? code)
-                        (conj total constraint)
-                        (let [existing-codes (set (remove nil? (concat (map :code constraints) (map :code total))))
-                              next-available-code (first (filter (complement blank?) (difference alphabet existing-codes)))]
-                          (conj total (assoc constraint :code next-available-code))))) [] constraints))))
+  (if (contains? query :where)
+    (update query :where
+           (fn [constraints]
+             (reduce (fn [total {:keys [code] :as constraint}]
+                       (if (some? code)
+                         (conj total constraint)
+                         (let [existing-codes      (set (remove nil? (concat (map :code constraints) (map :code total))))
+                               next-available-code (first (filter (complement blank?) (difference alphabet existing-codes)))]
+                           (conj total (assoc constraint :code next-available-code))))) [] constraints)))
+    query))
 
 
 (defn enforce-sorting [query]
-  (update query :sortOrder
-          (partial map
-                   (fn [order]
-                     (let [order (if (nil? (:path order))
-                                   {:path (str (name (first (first (seq order)))))
-                                    :direction (second (first (seq order)))}
-                                   order)]
-                       (if (= (:from query) (first (clojure.string/split (:path order) #"\.")))
-                         order
-                         (assoc order :path (str (:from query) "." (:path order)))))))))
+  (if (contains? query :sortOrder)
+    (update query :sortOrder
+            (partial map
+                     (fn [order]
+                       (let [order (if (nil? (:path order))
+                                     {:path (str (name (first (first (seq order)))))
+                                      :direction (second (first (seq order)))}
+                                     order)]
+                         (if (= (:from query) (first (clojure.string/split (:path order) #"\.")))
+                           order
+                           (assoc order :path (str (:from query) "." (:path order))))))))
+    query))
 
 (def sterilize-query (comp
                        enforce-sorting
