@@ -7,7 +7,7 @@
 (defn basic-auth
   "Given a username and a password return an API token"
   [service username password]
-  (restful :basic-auth "/user/token" service {:username username :password password} :token))
+  (restful :get "/user/token" service {:basic-auth {:username username :password password}} :token))
 
 (defn who-am-i?
   "Given a token return user information"
