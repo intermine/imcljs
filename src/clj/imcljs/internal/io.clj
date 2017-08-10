@@ -1,6 +1,5 @@
 (ns imcljs.internal.io
-  (:require [clojure.walk :as walk]
-            [clj-http.client :as client]
+  (:require [clj-http.client :as client]
             [imcljs.internal.defaults :refer [url]]))
 
 (def method-map {:get client/get
