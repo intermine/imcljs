@@ -6,7 +6,8 @@
                  :post client/post
                  :delete client/delete})
 
-(def default-options {:as :json})
+(def default-options {:as :json
+                      :throw-exceptions false})
 
 (def username-password (juxt :username :password))
 
