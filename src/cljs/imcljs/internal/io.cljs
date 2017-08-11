@@ -1,11 +1,10 @@
 (ns imcljs.internal.io
-
-  (:require #?(:cljs [cljs-http.client :refer [post get delete]]
-               :clj [clj-http.client :refer [post get delete]])
-                    [imcljs.internal.utils :refer [scrub-url]]
-                    [imcljs.internal.defaults :refer [url wrap-get-defaults wrap-request-defaults
-                                                      wrap-post-defaults wrap-auth wrap-accept
-                                                      wrap-delete-defaults]]))
+  (:require [cljs-http.client :refer [post get delete]]
+            [imcljs.internal.utils :refer [scrub-url]]
+            [imcljs.internal.defaults
+             :refer [url wrap-get-defaults wrap-request-defaults
+                     wrap-post-defaults wrap-auth wrap-accept
+                     wrap-delete-defaults transform-if-successful]]))
 
 ;(defn body-
 ;  "Parses the body of the web service response.
@@ -52,10 +51,13 @@
 (defn basic-auth-wrapper-
   "Returns the results of queries as table rows."
   [path {:keys [root token model]} options & [xform]]
-  (get (url root path)
+  ; clj-http expects basic-auth params as [username password
+  ; cljs-http expects basic-auth params as {:username username :password password}
+  (let [basic-auth-params options]
+    (get (url root path)
        (-> {} ; Blank request map
            (wrap-request-defaults xform) ; Add defaults such as with-credentials false?
-           (assoc :basic-auth options))))
+           (assoc :basic-auth basic-auth-params)))))
 
 (defmulti restful (fn [method & args] method))
 
