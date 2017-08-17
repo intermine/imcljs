@@ -19,3 +19,9 @@
   (cond->> url
            (missing-http?- url) (str "http://")
            (missing-service?- url) (append- "/service")))
+
+(defn copy-list-query
+  [{old-list-name :name old-list-type :type :as old-list-details}]
+  {:from old-list-type
+   :select [(str old-list-type ".id")]
+   :where [{:path old-list-type :op "IN" :value old-list-name}]})

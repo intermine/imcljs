@@ -7,6 +7,7 @@
             [imcljs.query :as query]
             [imcljs.save :as save]
             [imcljs.entity :as entity]
+            [imcljs.send :as send]
             [imcljs.auth :as auth]))
 
 (enable-console-print!)

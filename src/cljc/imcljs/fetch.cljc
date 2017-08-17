@@ -60,6 +60,10 @@
   [service & [options]]
   (restful :get "/lists" service options :lists))
 
+(defn one-list
+  [service name & [options]]
+  (restful :get "/lists" service (merge {:name name} options) (comp first :lists)))
+
 (defn model
   [service & [options]]
   (restful :get "/model" service options :model))
