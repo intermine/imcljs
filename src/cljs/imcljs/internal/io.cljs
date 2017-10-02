@@ -17,6 +17,16 @@
 ;      ;(close! request-chan)
 ;      (if xform (xform response) response))))
 
+(defn post-body-wrapper-
+  "Returns the results of queries as table rows."
+  [path {:keys [root token model]} options & [xform]]
+  (post (url root path)
+        (-> options ; Blank request map
+            ;(wrap-accept)
+            (wrap-request-defaults xform) ; Add defaults such as with-credentials false?
+            ;(wrap-post-defaults options model) ; Add form params
+            (wrap-auth token))))
+
 
 (defn post-wrapper-
   "Returns the results of queries as table rows."
@@ -64,6 +74,10 @@
 (defmethod restful :post [method path service options & [xform]]
   ;(body- (post-wrapper- path service options) xform)
   (post-wrapper- path service options xform))
+
+(defmethod restful :post-body [method path service options & [xform]]
+  ;(body- (post-wrapper- path service options) xform)
+  (post-body-wrapper- path service options xform))
 
 
 (defmethod restful :get [method path service options & [xform]]
