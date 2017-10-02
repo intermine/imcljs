@@ -33,9 +33,11 @@
            :channel (chan 1 (map (if xform (transform-if-successful xform) :body)))))
 
 (defn wrap-post-defaults [request options & [model]]
-  (assoc request :form-params (cond-> options
-                                      (contains? options :query) (assoc :query (->xml model (:query options)))
-                                      (missing? options :format) (assoc :format "json"))))
+  (if options
+    (assoc request :form-params (cond-> options
+                                       (contains? options :query) (assoc :query (->xml model (:query options)))
+                                       (missing? options :format) (assoc :format "json")))
+    request))
 
 (defn wrap-get-defaults [request options]
   (assoc request :query-params (cond-> options

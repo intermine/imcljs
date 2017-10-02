@@ -21,12 +21,12 @@
       (go
         ; Add a token to our service
         (let [service (assoc service :token (<! (fetch/session service)))]
-          (let [ ; Create a new list
-                new-list-name    (:listName (<! (save/im-list-from-query service flymine-query "Some List")))
+          (let [; Create a new list
+                new-list-name  (:listName (<! (save/im-list-from-query service "Some List" flymine-query)))
                 ; Add a " - Duplicate" string to the end of the original list name
-                duplicate-name   (str new-list-name " - Duplicate")
+                duplicate-name (str new-list-name " - Duplicate")
                 ; Copy the list and return its name
-                copied-list (<! (save/im-list-copy service new-list-name duplicate-name))]
+                copied-list    (<! (save/im-list-copy service new-list-name duplicate-name))]
             ; Confirm that the duplicate name string matches the
             (is (and
                   (= duplicate-name (:listName copied-list))
@@ -39,15 +39,28 @@
       (go
         ; Add a token to our service
         (let [service (assoc service :token (<! (fetch/session service)))]
-          (let [ ; Create a new list
-                new-list-name    (:listName (<! (save/im-list-from-query service flymine-query "Some List")))
+          (let [; Create a new list
+                new-list-name (:listName (<! (save/im-list-from-query service "Some List" flymine-query)))
                 ; Add a " - Renamed" string to the end of the original list name
-                new-name   (str new-list-name " - Renamed")
+                new-name      (str new-list-name " - Renamed")
                 ; Copy the list and return its name
-                renamed-list (<! (save/im-list-rename service new-list-name new-name))]
+                renamed-list  (<! (save/im-list-rename service new-list-name new-name))]
             ; Confirm that the renamed list name matches
             (is (and
                   (= new-name (:listName renamed-list))
                   (= true (:wasSuccessful renamed-list))))
             (done)))))))
 
+(deftest create-list
+  (testing "Should be able to create a list from a string of identifiers"
+    (async done
+      (go
+        ; Add a token to our service
+        (let [service (assoc service :token (<! (fetch/session service)))]
+          (let [list-name "create-list test"
+                new-list (<! (save/im-list service list-name "Gene" "zen mad"))]
+            ; Confirm that the renamed list name matches
+            (is (and
+                  (= list-name (:listName new-list))
+                  (= true (:wasSuccessful new-list))))
+            (done)))))))

@@ -7,22 +7,11 @@
        :clj
             [clojure.core.async :refer [<! >! go chan]])))
 
-;(defn copy-list-query [{:keys [name type]}]
-;  {:from type
-;   :select [(str type ".id")]
-;   :where [{:path type
-;            :op "IN"
-;            :value name}]})
-
-
-; Indentifiers need to be sent in the body as text/plain. How can we do this with cljs-http?
-;(defn im-list-append
-;  [service name identifiers-str & [options]]
-;  (restful :post "/lists/rename" service (merge {:name name :newname new-name :format "json"} options)))
 
 (defn im-list
-  [service name query & [options]]
-  (restful :post "/query/tolist" service (merge {:name name :query query :format "json"} options)))
+  "Creates a list using a plain text string of identifiers"
+  [service name type identifiers & [options]]
+  (restful :post-body (str "/lists?name=" name "&type=" type) service {:body identifiers :headers {"Content-Type" "text/plain"}}))
 
 (defn im-list-delete
   [service name & [options]]
@@ -49,9 +38,8 @@
   (restful :post "/lists/subtract" service (merge {:references source-lists :subtract subtract-lists :name name :format "json"} options)))
 
 (defn im-list-from-query
-  "Save the results of a query to a list"
-  [service query name & [options]]
-  (restful :post "/query/tolist" service (assoc options :query query :name name)))
+  [service name query & [options]]
+  (restful :post "/query/tolist" service (merge {:name name :query query :format "json"} options)))
 
 (defn im-list-copy
   "Copy a list by name"
@@ -59,4 +47,4 @@
   ; Get the details of the old list
   (go (let [old-list-details (<! (fetch/one-list service old-name))]
         ; Create a query from the old list and use it to save the new list
-        (<! (im-list-from-query service (copy-list-query old-list-details) new-name)))))
+        (<! (im-list-from-query service new-name (copy-list-query old-list-details))))))
