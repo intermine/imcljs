@@ -1,6 +1,7 @@
 (ns imcljs.core
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [imcljs.fetch :as fetch]
+            [cljs-http.client :refer [post get delete]]
             [cljs.core.async :refer [<!]]
             [cljs-http.client :as client]
             [imcljs.path :as path]
@@ -12,7 +13,7 @@
 
 (enable-console-print!)
 
-(def service {:root "www.flymine.org/query"
+(def service {:root "beta.flymine.org/beta"
               :model {:name "genomic"}})
 
 (def simple-query {:from "Gene" :select ["Gene.organism.name"] :size 10})
@@ -54,7 +55,6 @@
 (defn on-js-reload []
   (go
     (let [model (<! (fetch/model service))])))
-
 
 
 

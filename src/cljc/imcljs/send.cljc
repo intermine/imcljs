@@ -19,6 +19,13 @@
     ; Fetch the details from the previous list
     (go (let [old-list-details (<! (fetch/one-list service old-name))]
           ; Create a query that copies the list and save it to the server
-          (>! response-chan (<! (query-to-list service (copy-list-query old-list-details) new-name)))))
+          (println "RTCssdfsdf" (-> old-list-details copy-list-query))
+
+          #_(>! response-chan (<! (query-to-list service (copy-list-query old-list-details) new-name)))))
     ; Return the channel that we just populated with the result
     response-chan))
+
+(defn delete-list
+  "Save the results of a query to a list"
+  [service name & [options]]
+  (restful :delete "/lists" service (assoc options :name name)))
