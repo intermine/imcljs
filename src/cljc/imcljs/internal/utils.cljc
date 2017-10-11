@@ -1,5 +1,9 @@
 (ns imcljs.internal.utils
-  (:require [clojure.string :refer [split]]))
+  #?(:cljs (:require-macros [cljs.core.async.macros :refer [go go-loop]]))
+  (:require [clojure.string :refer [split]]
+    #?(:cljs [cljs.core.async :as a :refer [<! >! chan]]
+       :clj
+            [clojure.core.async :as a :refer [<! >! go go-loop chan]])))
 
 (def does-not-contain? (complement contains?))
 
@@ -25,3 +29,14 @@
   {:from old-list-type
    :select [(str old-list-type ".id")]
    :where [{:path old-list-type :op "IN" :value old-list-name}]})
+
+(defn <<!
+  "Given a collection of channels, returns a collection containing
+  the first result of each channel (similiar to JS Promise.all)"
+  [chans]
+  (go-loop [coll '()
+            chans chans]
+           (if (seq chans)
+             (recur (conj coll (<! (first chans)))
+                    (rest chans))
+             coll)))

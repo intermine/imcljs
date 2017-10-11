@@ -2,10 +2,10 @@
   #?(:cljs (:require-macros [cljs.core.async.macros :refer [go]]))
   (:require [imcljs.internal.io :refer [restful]]
             [imcljs.fetch :as fetch :refer [lists]]
-            [imcljs.internal.utils :refer [copy-list-query]]
-    #?(:cljs [cljs.core.async :refer [<! >! chan]]
+            [imcljs.internal.utils :refer [copy-list-query <<!]]
+    #?(:cljs [cljs.core.async :as a :refer [<! >! chan]]
        :clj
-            [clojure.core.async :refer [<! >! go chan]])))
+            [clojure.core.async :as a :refer [<! >! go chan]])))
 
 
 (defn im-list
@@ -14,8 +14,11 @@
   (restful :post-body (str "/lists?name=" name "&type=" type) service {:body identifiers :headers {"Content-Type" "text/plain"}}))
 
 (defn im-list-delete
-  [service name & [options]]
-  (restful :delete "/lists" service (merge {:name name :format "json"} options)))
+  "Delete one or name lists."
+  [service names & [options]]
+  (if (coll? names)
+    (<<! (map (fn [name] (restful :delete "/lists" service (merge {:name name :format "json"} options))) names))
+    (restful :delete "/lists" service (merge {:name names :format "json"} options))))
 
 (defn im-list-rename
   [service old-name new-name & [options]]

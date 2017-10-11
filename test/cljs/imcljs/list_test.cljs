@@ -4,7 +4,8 @@
             [cljs.core.async :refer [<!]]
             [imcljs.path :as path]
             [imcljs.fetch :as fetch]
-            [imcljs.save :as save]))
+            [imcljs.save :as save]
+            [imcljs.internal.utils :refer [<<!]]))
 
 (def service {:root "www.flymine.org/query"
               :model {:name "genomic"}})
@@ -58,9 +59,48 @@
         ; Add a token to our service
         (let [service (assoc service :token (<! (fetch/session service)))]
           (let [list-name "create-list test"
-                new-list (<! (save/im-list service list-name "Gene" "zen mad"))]
+                new-list  (<! (save/im-list service list-name "Gene" "zen mad"))]
             ; Confirm that the renamed list name matches
             (is (and
                   (= list-name (:listName new-list))
                   (= true (:wasSuccessful new-list))))
             (done)))))))
+
+(deftest delete-list
+  (testing "Should be able to delete a single list"
+    (async done
+      (go
+        (let [service (assoc service :token (<! (fetch/session service)))]
+          (let [delete-status (->>
+                                (save/im-list service (gensym) "Gene" "eve thor zen")
+                                <!
+                                :listName
+                                (save/im-list-delete service)
+                                <!
+                                :wasSuccessful)]
+            (is (true? delete-status)))
+          (done))))))
+
+(deftest delete-lists
+  (testing "Should be able to delete multiple lists"
+    (async done
+      (go
+        (let [service (assoc service :token (<! (fetch/session service)))]
+          (let [delete-status-col (->>
+                                    (repeatedly gensym)
+                                    (take 3)
+                                    (map (fn [name] (save/im-list service name "Gene" "eve thor zen")))
+                                    <<!
+                                    <!
+                                    (map :listName)
+                                    (save/im-list-delete service)
+                                    <!
+                                    (map :wasSuccessful))]
+            (is (and
+                  (some? (not-empty delete-status-col))
+                  (every? true? delete-status-col))))
+          (done))))))
+
+
+
+

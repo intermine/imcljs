@@ -1,5 +1,5 @@
 (ns imcljs.core
-  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [imcljs.fetch :as fetch]
             [cljs-http.client :refer [post get delete]]
             [cljs.core.async :refer [<!]]
@@ -9,7 +9,9 @@
             [imcljs.save :as save]
             [imcljs.entity :as entity]
             [imcljs.send :as send]
-            [imcljs.auth :as auth]))
+            [imcljs.auth :as auth]
+            [cljs-http.client :as http]
+            [imcljs.internal.utils :refer [<<!]]))
 
 (enable-console-print!)
 
@@ -50,6 +52,8 @@
                          "Gene.alleles.phenotypeAnnotations.annotationType"
                          "Gene.alleles.phenotypeAnnotations.description"],
                 :where [{:path "Gene.symbol", :value "zen", :op "="}]})
+
+
 
 
 (defn on-js-reload []
