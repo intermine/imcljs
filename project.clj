@@ -1,4 +1,4 @@
-(defproject intermine/imcljs "0.1.32"
+(defproject intermine/imcljs "0.1.33"
   :description "imcljs"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
@@ -12,7 +12,8 @@
                  [org.clojure/core.async "0.3.443"]
                  [cljs-http "0.1.42"]
                  [clj-http "3.6.0"]
-                 [cheshire "5.7.1"]]
+                 [cheshire "5.7.1"]
+                 [aysylu/loom "1.0.0"]]
 
   :plugins [[lein-figwheel "0.5.8"]
             [lein-cljsbuild "1.1.6" :exclusions [[org.clojure/clojure]]]
