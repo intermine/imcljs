@@ -10,6 +10,12 @@
                 (merge (assoc total class-name class-map) direct-descendants))
               total)) {} (:classes model)))
 
+(defn ext-by [model class]
+  (->> model
+       :classes
+       (filter #(->> % second :extends (filter #{(name class)}) not-empty))
+       (map first)))
+
 (defn extended-by-tree
   "Returns classes that directly extend the provided class in a tree structure"
   [model class]
@@ -18,3 +24,10 @@
               (let [direct-descendants (extended-by-tree model class-name)]
                 (assoc total class-name (assoc class-map :descendants direct-descendants)))
               total)) {} (:classes model)))
+
+
+
+
+
+
+

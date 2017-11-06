@@ -44,6 +44,14 @@
   [service name query & [options]]
   (restful :post "/query/tolist" service (merge {:name name :query query :format "json"} options)))
 
+(defn im-list-add-tag
+  [service name tags & [options]]
+  (restful :post "/list/tags" service (merge {:name name
+                                              :tags (if (coll? tags) (interpose ";" tags) tags)
+                                              :format "json"}
+                                             options)))
+
+
 (defn im-list-copy
   "Copy a list by name"
   [service old-name new-name & [options]]

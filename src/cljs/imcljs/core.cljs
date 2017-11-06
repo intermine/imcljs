@@ -16,7 +16,8 @@
 (enable-console-print!)
 
 (def service {:root "beta.flymine.org/beta"
-              :model {:name "genomic"}})
+              :model {:name "genomic"}
+              :token "01W56dHbAdi2Z4U7xfAe"})
 
 (def simple-query {:from "Gene" :select ["Gene.organism.name"] :size 10})
 
@@ -53,12 +54,22 @@
                          "Gene.alleles.phenotypeAnnotations.description"],
                 :where [{:path "Gene.symbol", :value "zen", :op "="}]})
 
+(def tquery {:title "pathway_genes1_1",
+             :from "Gene",
+             :select ["Gene.secondaryIdentifier"
+                      "Gene.symbol"
+                      "Gene.primaryIdentifier"
+                      "Gene.organism.name"],
+             :where [{:path "Gene", :op "IN", :value "pathway_genes1_1"}]})
+
 
 
 
 (defn on-js-reload []
   (go
-    (let [model (<! (fetch/model service))])))
+    (let [model (<! (fetch/model service))]
+      (let [m (entity/ext-by model :SequenceFeature)]
+        (js/console.log "finished2" model (query/group-views-by-class model tquery))))))
 
 
 
