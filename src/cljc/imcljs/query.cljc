@@ -161,7 +161,7 @@
     (reduce (fn [path-map next-path]
               (update path-map (path/class model next-path)
                       (comp set conj)
-                      {:path (path/trim-to-last-class model next-path)
+                      {:path (str (path/trim-to-last-class model next-path) ".id")
                        :type (path/class model next-path)
                        :query (assoc query :select [(str (path/trim-to-last-class model next-path) ".id")])}))
             {} (:select query))))
