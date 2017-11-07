@@ -1,8 +1,9 @@
 (ns imcljs.fetch
-  #?(:cljs (:require-macros [cljs.core.async.macros :refer [go]]))
+  #?(:cljs (:require-macros [cljs.core.async.macros :refer [go go-loop]]))
   (:require [imcljs.internal.io :refer [restful]]
-    #?(:cljs [cljs.core.async :refer [<! >! chan]]
-       :clj [clojure.core.async :refer [<! >! go chan]])))
+    #?(:cljs [cljs.core.async :refer [<! >! chan timeout]]
+       :clj
+            [clojure.core.async :refer [<! >! timeout go go-loop chan]])))
 
 ; Quicksearch
 
@@ -109,3 +110,42 @@
   "Returns the version of InterMine being run, e.g. '1.6.6'"
   [service]
   (restful :get "/version/intermine" service {:format "text"}))
+
+; ID Resolution
+
+(defn fetch-id-resolution-job-results
+  "Fetches the results of an id resolution job"
+  [service uid]
+  (restful :get (str "/ids/" uid "/results") service {} :results))
+
+(defn fetch-id-resolution-job-status
+  "Fetches the status of an id resolution job"
+  [service uid]
+  (restful :get (str "/ids/" uid "/status") service))
+
+(defn fetch-id-resolution-job
+  "Starts an id resolution job"
+  [service {:keys [identifiers type case-sensitive wild-cards extra] :as options}]
+  (restful :post-body "/ids" service
+           {:body (cond-> {:identifiers identifiers}
+                          type (assoc :type type)
+                          case-sensitive (assoc :caseSensitive true)
+                          wild-cards (assoc :wildCards true)
+                          extra (assoc :extra extra))
+            :headers {"Content-Type" "application/json"}}))
+
+(defn resolve-identifiers
+  "Resolves identifiers. Automatically handles polling"
+  [service {:keys [identifiers type case-sensitive wild-cards extra timeout-ms] :as options}]
+  (let [return-chan (chan 1)]
+    (go (let [job (<! (fetch-id-resolution-job service options))]
+          (go-loop [ms 100]
+            (let [{:keys [status uid]} (<! (fetch-id-resolution-job-status service (:uid job)))]
+              (if (= "SUCCESS" status)
+                (let [results (<! (fetch-id-resolution-job-results service (:uid job)))]
+                  (>! return-chan results))
+                (do
+                  (<! (timeout ms))
+                  (when (< ms (or timeout 10000))
+                    (recur (* ms 1.5)))))))))
+    return-chan))

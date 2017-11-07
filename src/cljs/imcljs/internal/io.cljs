@@ -25,7 +25,10 @@
             ;(wrap-accept)
             (wrap-request-defaults xform) ; Add defaults such as with-credentials false?
             ;(wrap-post-defaults options model) ; Add form params
-            (wrap-auth token))))
+            (wrap-auth token)
+            ; Stringify the clojure body to a JSON data structure
+            ; This should still work when sending plain/text rather than application/json
+            (update :body (comp js/JSON.stringify clj->js)))))
 
 
 (defn post-wrapper-

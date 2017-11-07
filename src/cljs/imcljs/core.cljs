@@ -64,12 +64,12 @@
 
 
 
-
 (defn on-js-reload []
   (go
     (let [model (<! (fetch/model service))]
       (let [m (entity/ext-by model :SequenceFeature)]
-        (js/console.log "finished2" model (query/group-views-by-class model tquery))))))
+        (<! (fetch/resolve-identifiers service {:type "Gene"
+                                                :identifiers ["eves" "thorz" "zen"]}))))))
 
 
 
