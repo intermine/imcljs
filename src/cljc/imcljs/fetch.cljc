@@ -146,6 +146,6 @@
                   (>! return-chan results))
                 (do
                   (<! (timeout ms))
-                  (when (< ms (or timeout 10000))
+                  (when (< ms (or timeout-ms 10000))
                     (recur (* ms 1.5)))))))))
     return-chan))
