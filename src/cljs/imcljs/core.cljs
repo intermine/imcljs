@@ -16,8 +16,7 @@
 (enable-console-print!)
 
 (def service {:root "beta.flymine.org/beta"
-              :model {:name "genomic"}
-              :token "01W56dHbAdi2Z4U7xfAe"})
+              :model {:name "genomic"}})
 
 (def simple-query {:from "Gene" :select ["Gene.organism.name"] :size 10})
 
