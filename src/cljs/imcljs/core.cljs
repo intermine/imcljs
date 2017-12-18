@@ -66,10 +66,7 @@
 
 (defn on-js-reload []
   (go
-    (let [model (<! (fetch/model service))]
-      (let [m (entity/ext-by model :SequenceFeature)]
-        (<! (fetch/resolve-identifiers service {:type "Gene"
-                                                :identifiers ["eves" "thorz" "zen"]}))))))
+    (let [model (<! (fetch/model service))])))
 
 
 
