@@ -69,6 +69,10 @@
   [service & [options]]
   (restful :get "/model" service options :model))
 
+(defn class-keys
+  [service & [options]]
+  (restful :get "/classkeys" service options :classes))
+
 (defn summary-fields
   [service & [options]]
   (restful :get "/summaryfields" service options :classes))
