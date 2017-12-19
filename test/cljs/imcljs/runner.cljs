@@ -3,6 +3,7 @@
             ;[imcljs.core-test]
             [imcljs.path-test]
             [imcljs.query-test]
-            [imcljs.list-test]))
+            [imcljs.list-test]
+            [imcljs.assets-test]))
 
-(doo-tests 'imcljs.path-test 'imcljs.query-test 'imcljs.list-test)
+(doo-tests 'imcljs.path-test 'imcljs.query-test 'imcljs.list-test 'imcljs.assets-test)
