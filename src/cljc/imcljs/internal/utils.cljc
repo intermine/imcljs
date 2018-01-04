@@ -3,7 +3,12 @@
   (:require [clojure.string :refer [split]]
     #?(:cljs [cljs.core.async :as a :refer [<! >! chan]]
        :clj
-            [clojure.core.async :as a :refer [<! >! go go-loop chan]])))
+            [clojure.core.async :as a :refer [<! >! go go-loop chan]])
+    #?(:clj
+            [clojure.data.codec.base64 :as b64])))
+
+
+
 
 (def does-not-contain? (complement contains?))
 
@@ -36,7 +41,10 @@
   [chans]
   (go-loop [coll '()
             chans chans]
-           (if (seq chans)
-             (recur (conj coll (<! (first chans)))
-                    (rest chans))
-             coll)))
+    (if (seq chans)
+      (recur (conj coll (<! (first chans)))
+             (rest chans))
+      coll)))
+
+(def base64 #?(:cljs js/btoa
+               :clj (fn [s] (String. (b64/encode (.getBytes s)) "UTF-8"))))
