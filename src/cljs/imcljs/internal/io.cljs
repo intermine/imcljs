@@ -53,13 +53,14 @@
 
 (defn request-wrapper-
   "Returns the results of queries as table rows."
-  [path {:keys [root token model]} options & [xform]]
+  [path {:keys [root token model headers]} options & [xform]]
   (get (url root path)
        (-> {} ; Blank request map
            ;(wrap-accept)
            (wrap-request-defaults xform) ; Add defaults such as with-credentials false?
            (wrap-get-defaults options) ; Add query params
            (wrap-auth token))))
+
 
 (defn basic-auth-wrapper-
   "Returns the results of queries as table rows."
@@ -68,15 +69,27 @@
   ; cljs-http expects basic-auth params as {:username username :password password}
   (let [basic-auth-params options]
     (get (url root path)
-       (-> {} ; Blank request map
-           (wrap-request-defaults xform) ; Add defaults such as with-credentials false?
-           (assoc :basic-auth basic-auth-params)))))
+         (-> {} ; Blank request map
+             (wrap-request-defaults xform) ; Add defaults such as with-credentials false?
+             (assoc :basic-auth basic-auth-params)))))
 
 (defmulti restful (fn [method & args] method))
+
+
+;(defmethod restful :raw [method path {:keys [root token model] :as service} request & [xform]]
+;  (let [http-fn (case method :get get :post post :delete delete)]
+;    (http-fn (url root path) request)))
 
 (defmethod restful :post [method path service options & [xform]]
   ;(body- (post-wrapper- path service options) xform)
   (post-wrapper- path service options xform))
+
+(defmethod restful :raw [_ method path {:keys [root token model] :as service} request & [xform]]
+  ;(body- (post-wrapper- path service options) xform)
+  (let [http-fn (case method :get get :post post :delete delete)]
+    (http-fn (url root path) (wrap-request-defaults request xform)))
+
+  #_(post-wrapper- path service options xform))
 
 (defmethod restful :post-body [method path service options & [xform]]
   ;(body- (post-wrapper- path service options) xform)
@@ -87,7 +100,6 @@
   ;(body- (request-wrapper- path service options) xform)
   (request-wrapper- path service options xform))
 
-
 (defmethod restful :delete [method path service options & [xform]]
   (delete-wrapper- path service options xform))
 
@@ -96,4 +108,8 @@
 ; make custom clj/s-http options param
 (defmethod restful :basic-auth [method path service options & [xform]]
   (basic-auth-wrapper- path service options xform))
+
+
+
+
 

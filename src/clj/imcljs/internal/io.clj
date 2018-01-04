@@ -1,5 +1,6 @@
 (ns imcljs.internal.io
   (:require [clj-http.client :as client]
+            [cheshire.core :as json]
             [imcljs.internal.defaults :refer [url wrap-request-defaults wrap-auth]]))
 
 (def method-map {:get client/get
@@ -43,7 +44,7 @@
   [xform response]
   (if xform
     (if (<= 200 (:status response) 300)
-      (xform (:body response))
+      (xform (json/parse-string (:body response) true))
       response)
     response))
 
@@ -80,6 +81,10 @@
 ; However, cljs-http and therefore uses a multimethod to wrap parameters appropriately
 (defmulti restful (fn [method & args] method))
 
+(defmethod restful :raw [_ method path {:keys [root token model] :as service} request & [xform]]
+  (let [http-fn (get method-map method)]
+    (parse-response xform (http-fn (url root path) request))))
+
 (defmethod restful :get [method path service options & [xform]]
   (get-body-wrapper- path service (merge options {:accept :json}) xform))
 
@@ -88,4 +93,5 @@
 
 (defmethod restful :default [method path service options & [xform]]
   (request method path service options xform))
+
 

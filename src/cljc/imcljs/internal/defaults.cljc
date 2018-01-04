@@ -1,8 +1,8 @@
 (ns imcljs.internal.defaults
   (:require #?(:cljs [cljs.core.async :refer [chan]]
                :clj [clojure.core.async :refer [chan]])
-            [imcljs.query :refer [->xml]]
-            [imcljs.internal.utils :refer [scrub-url]]))
+                    [imcljs.query :refer [->xml]]
+                    [imcljs.internal.utils :refer [scrub-url]]))
 
 (def missing? (complement contains?))
 
@@ -35,8 +35,8 @@
 (defn wrap-post-defaults [request options & [model]]
   (if options
     (assoc request :form-params (cond-> options
-                                       (contains? options :query) (assoc :query (->xml model (:query options)))
-                                       (missing? options :format) (assoc :format "json")))
+                                        (contains? options :query) (assoc :query (->xml model (:query options)))
+                                        (missing? options :format) (assoc :format "json")))
     request))
 
 (defn wrap-get-defaults [request options]
