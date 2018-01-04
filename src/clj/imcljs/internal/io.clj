@@ -44,7 +44,7 @@
   [xform response]
   (if xform
     (if (<= 200 (:status response) 300)
-      (xform (json/parse-string (:body response) true))
+      (xform (:body response))
       response)
     response))
 
@@ -83,7 +83,7 @@
 
 (defmethod restful :raw [_ method path {:keys [root token model] :as service} request & [xform]]
   (let [http-fn (get method-map method)]
-    (parse-response xform (http-fn (url root path) request))))
+    (parse-response xform (http-fn (url root path) (merge request (merge {:as :json}))))))
 
 (defmethod restful :get [method path service options & [xform]]
   (get-body-wrapper- path service (merge options {:accept :json}) xform))
