@@ -87,9 +87,7 @@
 (defmethod restful :raw [_ method path {:keys [root token model] :as service} request & [xform]]
   ;(body- (post-wrapper- path service options) xform)
   (let [http-fn (case method :get get :post post :delete delete)]
-    (http-fn (url root path) (wrap-request-defaults request xform)))
-
-  #_(post-wrapper- path service options xform))
+    (http-fn (url root path) (wrap-request-defaults request xform))))
 
 (defmethod restful :post-body [method path service options & [xform]]
   ;(body- (post-wrapper- path service options) xform)
