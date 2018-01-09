@@ -1,4 +1,4 @@
-(defproject intermine/imcljs "0.3.2"
+(defproject intermine/imcljs "0.3.3"
   :description "imcljs"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
