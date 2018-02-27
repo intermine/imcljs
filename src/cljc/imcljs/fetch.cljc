@@ -115,6 +115,15 @@
   [service]
   (restful :get "/version/intermine" service {:format "text"}))
 
+; Mine-specific config endpoint
+
+(defn web-properties
+  "Returns the default configs for a given mine. These are important as they're
+   used to initialise most bluegenes page sections! "
+  [service]
+  (restful :get "/web-properties" service {} :web-properties))
+
+
 ; ID Resolution
 
 (defn fetch-id-resolution-job-results
