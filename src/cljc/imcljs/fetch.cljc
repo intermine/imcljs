@@ -121,7 +121,7 @@
   "Returns the default configs for a given mine. These are important as they're
    used to initialise most bluegenes page sections! "
   [service]
-  (restful :get "/web-properties" service))
+  (restful :get "/web-properties" service {} :web-properties))
 
 
 ; ID Resolution
