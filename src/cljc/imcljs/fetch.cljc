@@ -1,6 +1,7 @@
 (ns imcljs.fetch
   #?(:cljs (:require-macros [cljs.core.async.macros :refer [go go-loop]]))
   (:require [imcljs.internal.io :refer [restful]]
+    [imcljs.query :as im-query]
     #?(:cljs [cljs.core.async :refer [<! >! chan timeout]]
        :clj
             [clojure.core.async :refer [<! >! timeout go go-loop chan]])))
@@ -162,3 +163,16 @@
                   (when (< ms (or timeout-ms 30000))
                     (recur (min 1000 (* ms 1.5))))))))))
     return-chan))
+
+; Code Generation
+
+(defn code
+  "Returns generate code to run the query in a given language"
+  [service model & [{:keys [lang query] :as options}]]
+  (restful :get "/query/code"
+           service
+           (-> options
+               ; Enforce JSON response so that the :code function below works
+               {:format "json"}
+               (update :query (partial im-query/->xml model)))
+           :code))
