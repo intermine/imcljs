@@ -168,10 +168,11 @@
 
 (defn code
   "Returns generate code to run the query in a given language"
-  [service model & [{:keys [lang query format] :as options}]]
+  [service model & [{:keys [lang query] :as options}]]
   (restful :get "/query/code"
            service
-           (-> {:format "json"}
-               (merge options)
+           (-> options
+               ; Enforce JSON response so that the :code function below works
+               {:format "json"}
                (update :query (partial im-query/->xml model)))
            :code))
