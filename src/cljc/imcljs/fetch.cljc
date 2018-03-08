@@ -173,6 +173,6 @@
            service
            (-> options
                ; Enforce JSON response so that the :code function below works
-               {:format "json"}
+               (merge {:format "json"})
                (update :query (partial im-query/->xml model)))
            :code))
