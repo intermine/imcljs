@@ -1,7 +1,10 @@
 (ns imcljs.internal.io
   (:require [clj-http.client :as client]
             [cheshire.core :as json]
-            [imcljs.internal.defaults :refer [url wrap-request-defaults wrap-auth]]))
+            [imcljs.query :as q]
+            [imcljs.internal.defaults :refer [url wrap-request-defaults
+                                              wrap-post-defaults
+                                              wrap-auth]]))
 
 (def method-map {:get client/get
                  :post client/post
@@ -64,9 +67,20 @@
                                         wrap-basic-auth
                                         ;(wrap-post-defaults options model) ; Add form params
                                         (wrap-auth token)
-                                        (merge {:as :json}))))
-  )
+                                        (merge {:as :json})))))
 
+(defn post-body-wrapper-
+  [path {:keys [root token model]} options & [xform]]
+  (parse-response xform (client/post (url root path)
+                                    (-> options ; Blank request map
+                                        ;(wrap-accept)
+                                        (wrap-request-defaults xform) ; Add defaults such as with-credentials false?
+                                        ; If we have basic auth options then convert them from the cljs-http to clj-http format
+                                        (wrap-post-defaults options model)
+                                        wrap-basic-auth
+                                        ;(wrap-post-defaults options model) ; Add form params
+                                        (wrap-auth token)
+                                        (merge {:as :json})))))
 
 
 ; Perform an HTTP request
@@ -87,6 +101,9 @@
 
 (defmethod restful :get [method path service options & [xform]]
   (get-body-wrapper- path service (merge options {:accept :json}) xform))
+
+(defmethod restful :post [method path service options & [xform]]
+  (post-body-wrapper- path service (merge options {:accept :json}) xform))
 
 (defmethod restful :basic-auth [method path service options & [xform]]
   (request method path service options xform))
