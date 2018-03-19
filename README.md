@@ -73,3 +73,17 @@ Most result-fetching functions require that the `:model` key be present in their
 (go (log (<! (fetch/row-count flymine my-query))))
 
 ```
+
+## Development
+
+### Running tests
+
+To run tests in the browser:
+```bash
+lein doo default
+```
+
+To run tests in the JVM:
+```bash
+lein test
+```
