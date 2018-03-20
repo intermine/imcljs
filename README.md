@@ -8,7 +8,7 @@ A Clojure/ClojureScript library for interacting with Intermine's web services.
 
 Add the necessary dependency to your project:
 
-![](https://clojars.org/intermine/imcljs/latest-version.svg)
+[![Clojars Project](https://img.shields.io/clojars/v/org.intermine/imcljs.svg)](https://clojars.org/org.intermine/imcljs)
 
 imcljs returns channels so you'll also want to include core.async
 
