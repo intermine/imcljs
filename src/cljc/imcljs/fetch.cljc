@@ -106,6 +106,11 @@
 
 ; Versions
 
+(defn version-web-service
+  "Returns the version of the InterMine WebService being run, e.g. '27'"
+  [service]
+  (restful :get "/version" service {:format "text"}))
+
 (defn version-release
   [service]
   "Returns the string identifying the build - 'flymine 23', for example."
