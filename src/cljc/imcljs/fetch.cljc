@@ -186,6 +186,9 @@
 
 (defn registry
   "Returns list of InterMines from the InterMine registry."
-  [dev-mines]
+  [dev-mines?]
   (get-plain "http://registry.intermine.org/service/instances"
-             {:with-credentials? false}))
+             (if dev-mines?
+               {:with-credentials? false
+                :query-params {:mines "all"}}
+               {:with-credentials? false})))
