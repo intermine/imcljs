@@ -1,3 +1,10 @@
-language: clojure
-lein: lein2
-script: lein2 doo phantom test once
+language: generic
+sudo: required
+
+before_script:
+  - wget https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein -O /tmp/lein
+  - chmod +x /tmp/lein
+  - export PATH=$PATH:/tmp/lein
+
+script:
+  - lein doo phantom test once
