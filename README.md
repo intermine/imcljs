@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/intermine/imcljs.svg?branch=master)](https://travis-ci.org/intermine/imcljs)
 
-A Clojure/ClojureScript library for interacting with Intermine's web services.
+A Clojure/ClojureScript library for interacting with InterMine's web services.
 
 ## Getting Start
 
@@ -87,3 +87,9 @@ To run tests in the JVM:
 ```bash
 lein test
 ```
+
+### Releasing new versions (Clojars)
+
+1. Make sure to update the version number in [project.clj](https://github.com/intermine/imcljs/blob/dev/project.clj#L1)
+2. Tag the [release with a matching version number in git and push the tag to GitHub](https://git-scm.com/book/en/v2/Git-Basics-Tagging)
+3. To [push the release to Clojars](https://github.com/clojars/clojars-web/wiki/Pushing), type `lein deploy clojars`. **Note** that you'll need to have a clojars account that is a member of the [org.intermine](https://clojars.org/search?q=org.intermine) team. Currently (October 2018)  this is @yochannah, @sergio, @danielabutano and @julie-sullivan.
