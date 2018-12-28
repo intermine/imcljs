@@ -1,6 +1,6 @@
 (ns imcljs.fetch
   #?(:cljs (:require-macros [cljs.core.async.macros :refer [go go-loop]]))
-  (:require [imcljs.internal.io :refer [restful]]
+  (:require [imcljs.internal.io :refer [restful get-plain]]
     [imcljs.query :as im-query]
     #?(:cljs [cljs.core.async :refer [<! >! chan timeout]]
        :clj
@@ -172,7 +172,7 @@
 ; Code Generation
 
 (defn code
-  "Returns generate code to run the query in a given language"
+  "Returns generated code to run the query in a given language"
   [service model & [{:keys [lang query] :as options}]]
   (restful :get "/query/code"
            service
@@ -181,3 +181,15 @@
                (merge {:format "json"})
                (update :query (partial im-query/->xml model)))
            :code))
+
+; Registry
+
+(defn registry
+  "Returns list of InterMines from the InterMine registry. dev-mines? needs to
+   be set to true if you want to return non-prod mines, or otherwise set to false"
+  [dev-mines?]
+  (get-plain "http://registry.intermine.org/service/instances"
+             (if dev-mines?
+               {:with-credentials? false
+                :query-params {:mines "all"}}
+               {:with-credentials? false})))

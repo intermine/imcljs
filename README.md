@@ -16,7 +16,7 @@ imcljs returns channels so you'll also want to include core.async
 
 ## Usage
 
-All imcljs funtions expect a map as their first parameter containing a mandtory `:root` key and two semi-optional keys, `:token` and `:model`.
+With the exception of the fetch/registry function, all imcljs functions expect a map as their first parameter containing a mandatory `:root` key and two semi-optional keys, `:token` and `:model`.
 
 ```clj
 (def flymine {:root  "www.flymine.org/query"
@@ -28,6 +28,24 @@ All imcljs funtions expect a map as their first parameter containing a mandtory 
 We recommend fetching the `model` once and storing it in the above map for re-use across your application.
 
 ## Examples
+
+### Fetching a list of InterMines from the Registry
+
+```cljs
+(let [;fetch all mines except the dev/beta mines
+      prod-mines (fetch/registry false)
+      ;fetch all mines INCLUDING the dev/beta mines
+      dev-and-prod-mines (fetch/registry true)]
+
+      (go
+        (let [prod (<! prod-mines )
+              dev (<! dev-and-prod-mines)]
+          ;; This should print true, so long as the sum of dev+prod mines is 
+          ;; greater than the count of prod mines
+          (.log js/console (< (count (:instances (:body prod)))
+              (count (:instances (:body dev)))))
+          )))
+```
 
 ### Fetching assets
 

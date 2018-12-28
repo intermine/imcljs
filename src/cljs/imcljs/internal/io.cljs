@@ -17,6 +17,12 @@
 ;      ;(close! request-chan)
 ;      (if xform (xform response) response))))
 
+(defn get-plain
+  "most methods assume communication with an InterMine.
+   This method allows comms with any server"
+  [url options]
+  (get url options))
+
 (defn post-body-wrapper-
   "Returns the results of queries as table rows."
   [path {:keys [root token model]} options & [xform]]
@@ -29,7 +35,6 @@
             ; Stringify the clojure body to a JSON data structure
             ; This should still work when sending plain/text rather than application/json
             (update :body (comp js/JSON.stringify clj->js)))))
-
 
 (defn post-wrapper-
   "Returns the results of queries as table rows."
@@ -61,7 +66,6 @@
            (wrap-get-defaults options) ; Add query params
            (wrap-auth token))))
 
-
 (defn basic-auth-wrapper-
   "Returns the results of queries as table rows."
   [path {:keys [root token model]} options & [xform]]
@@ -74,7 +78,6 @@
              (assoc :basic-auth basic-auth-params)))))
 
 (defmulti restful (fn [method & args] method))
-
 
 ;(defmethod restful :raw [method path {:keys [root token model] :as service} request & [xform]]
 ;  (let [http-fn (case method :get get :post post :delete delete)]
@@ -93,7 +96,6 @@
   ;(body- (post-wrapper- path service options) xform)
   (post-body-wrapper- path service options xform))
 
-
 (defmethod restful :get [method path service options & [xform]]
   ;(body- (request-wrapper- path service options) xform)
   (request-wrapper- path service options xform))
@@ -106,8 +108,3 @@
 ; make custom clj/s-http options param
 (defmethod restful :basic-auth [method path service options & [xform]]
   (basic-auth-wrapper- path service options xform))
-
-
-
-
-

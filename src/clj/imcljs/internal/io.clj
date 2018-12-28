@@ -13,6 +13,12 @@
 (def default-options {:as :json})
 ;:throw-exceptions false
 
+(defn get-plain
+  "most methods assume communication with an InterMine.
+   This method allows comms with any server"
+  [url options]
+  (client/get url options))
+
 
 (def username-password (juxt :username :password))
 
@@ -110,5 +116,3 @@
 
 (defmethod restful :default [method path service options & [xform]]
   (request method path service options xform))
-
-
