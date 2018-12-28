@@ -185,7 +185,8 @@
 ; Registry
 
 (defn registry
-  "Returns list of InterMines from the InterMine registry."
+  "Returns list of InterMines from the InterMine registry. dev-mines? needs to
+   be set to true if you want to return non-prod mines, or otherwise set to false"
   [dev-mines?]
   (get-plain "http://registry.intermine.org/service/instances"
              (if dev-mines?
