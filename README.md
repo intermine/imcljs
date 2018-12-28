@@ -1,6 +1,6 @@
 # imcljs
 
-[![Build Status](https://travis-ci.org/intermine/imcljs.svg?branch=master)](https://travis-ci.org/intermine/imcljs)
+[![Build Status](https://travis-ci.org/intermine/imcljs.svg?branch=dev)](https://travis-ci.org/intermine/imcljs)
 
 A Clojure/ClojureScript library for interacting with InterMine's web services.
 
