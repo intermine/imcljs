@@ -4,6 +4,7 @@
             [imcljs.path-test]
             [imcljs.query-test]
             [imcljs.list-test]
-            [imcljs.assets-test]))
+            [imcljs.assets-test]
+            [imcljs.registry-test]))
 
 (doo-tests 'imcljs.path-test 'imcljs.query-test 'imcljs.list-test 'imcljs.assets-test 'imcljs.registry-test)

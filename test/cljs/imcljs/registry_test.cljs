@@ -4,12 +4,16 @@
             [cljs.core.async :refer [<!]]
             [imcljs.fetch :as fetch]))
 
-(deftest get-plain
-  (let [request (fetch/registry false)]
-    (testing "registry should return some InterMines"
+(deftest registry
+  (let [prod-mines (fetch/registry false)
+        dev-and-prod-mines (fetch/registry true)]
+    (testing "registry should return some InterMines, but there should be fewer
+              prod than prod+dev mines"
       (async done
-        (go
-          (let [res (<! request)]
-            (println res)
-            (is (= 1 1))
-            (done)))))))
+             (go
+               (let [prod (<! prod-mines)
+                     dev (<! dev-and-prod-mines)]
+                 (is (<
+                      (count (:instances (:body prod)))
+                      (count (:instances (:body dev)))))
+                 (done)))))))
