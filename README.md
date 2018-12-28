@@ -1,10 +1,12 @@
 # imcljs
 
 [![Build Status](https://travis-ci.org/intermine/imcljs.svg?branch=dev)](https://travis-ci.org/intermine/imcljs)
+[![Clojars Project](https://img.shields.io/clojars/v/org.intermine/imcljs.svg)](https://clojars.org/org.intermine/imcljs)
+
 
 A Clojure/ClojureScript library for interacting with InterMine's web services.
 
-## Getting Start
+## Getting Started
 
 Add the necessary dependency to your project:
 
@@ -96,9 +98,11 @@ Most result-fetching functions require that the `:model` key be present in their
 
 ### Running tests
 
-To run tests in the browser:
+**Required dependency:** phantomjs, to run the tests in a headless javascript engine. You'll need a recent version of node installed, perhaps via [nvm](https://github.com/creationix/nvm). Once node is installed, run `npm install -g phantomjs` to install phantomjs. 
+
+**To run tests in the browser:**
 ```bash
-lein doo default
+lein doo
 ```
 
 To run tests in the JVM:
