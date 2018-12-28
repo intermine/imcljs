@@ -87,7 +87,9 @@
 (defn session
   "Returns a temporary API token."
   [service & [options]]
-  (restful :get "/session" service options :token))
+  ;;remove any old tokens passed in as they'll cause an auth failure
+  (let [token-free-service (dissoc service :token)]
+  (restful :get "/session" token-free-service options :token)))
 
 ; Widgets
 
