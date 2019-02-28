@@ -13,11 +13,13 @@
                  [cljs-http "0.1.42"]
                  [clj-http "3.6.0"]
                  [cheshire "5.7.1"]
-                 [aysylu/loom "1.0.0"]]
+                 [aysylu/loom "1.0.0"]
+                 [lein-cljfmt "0.6.1"]]
 
   :plugins [[lein-figwheel "0.5.8"]
             [lein-cljsbuild "1.1.6" :exclusions [[org.clojure/clojure]]]
             [lein-doo "0.1.7"]]
+            :aliases {"format" ["cljfmt" "fix"]}
 
   :source-paths ["src/cljc" "src/cljs" "src/clj" "test/clj" "test/cljs"]
 
