@@ -14,11 +14,12 @@
                            [clj-http "3.6.0"]
                            [cheshire "5.7.1"]
                            [aysylu/loom "1.0.0"]]
-
+            :codox {:language :clojurescript}
             :plugins [[lein-figwheel "0.5.8"]
-
+                      [lein-codox "0.10.5"]
                       [lein-cljfmt "0.6.1"]
-                      [lein-cljsbuild "1.1.6" :exclusions [[org.clojure/clojure]]]
+                      [lein-cljsbuild "1.1.6"
+                       :exclusions [[org.clojure/clojure]]]
                       [lein-doo "0.1.7"]]
             :aliases {"format" ["cljfmt" "fix"]}
 
