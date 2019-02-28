@@ -30,7 +30,6 @@
             ; This should still work when sending plain/text rather than application/json
             (update :body (comp js/JSON.stringify clj->js)))))
 
-
 (defn post-wrapper-
   "Returns the results of queries as table rows."
   [path {:keys [root token model]} options & [xform]]
@@ -61,7 +60,6 @@
            (wrap-get-defaults options) ; Add query params
            (wrap-auth token))))
 
-
 (defn basic-auth-wrapper-
   "Returns the results of queries as table rows."
   [path {:keys [root token model]} options & [xform]]
@@ -80,6 +78,7 @@
 ;  (let [http-fn (case method :get get :post post :delete delete)]
 ;    (http-fn (url root path) request)))
 
+
 (defmethod restful :post [method path service options & [xform]]
   ;(body- (post-wrapper- path service options) xform)
   (post-wrapper- path service options xform))
@@ -93,7 +92,6 @@
   ;(body- (post-wrapper- path service options) xform)
   (post-body-wrapper- path service options xform))
 
-
 (defmethod restful :get [method path service options & [xform]]
   ;(body- (request-wrapper- path service options) xform)
   (request-wrapper- path service options xform))
@@ -105,7 +103,11 @@
 ; rather than make an edge case (:basic-auth is not an HTTP verb!),
 ; make custom clj/s-http options param
 (defmethod restful :basic-auth [method path service options & [xform]]
-  (basic-auth-wrapper- path service options xform))
+  (basic-auth-wrapper- path service options
+
+
+
+                       xform))
 
 
 

@@ -23,7 +23,11 @@
             (if (one-of? (:extends class-map) (name class))
               (let [direct-descendants (extended-by-tree model class-name)]
                 (assoc total class-name (assoc class-map :descendants direct-descendants)))
-              total)) {} (:classes model)))
+              total)) {} (:classes
+
+
+
+                          model)))
 
 
 

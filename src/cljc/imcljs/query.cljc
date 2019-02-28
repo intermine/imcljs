@@ -6,7 +6,6 @@
 
 (defn value [x] (str "<value>" x "</value>"))
 
-
 (defn rename-key [m old-k new-k]
   (-> m (assoc new-k (get m old-k)) (dissoc old-k)))
 
@@ -98,7 +97,6 @@
                             (conj total (assoc constraint :code next-available-code))))) [] constraints)))
     query))
 
-
 (defn enforce-sorting [query]
   (if (contains? query :sortOrder)
     (update query :sortOrder
@@ -114,12 +112,12 @@
     query))
 
 (def sterilize-query (comp
-                       enforce-sorting
-                       enforce-constraints-have-class
-                       enforce-constraints-have-code
-                       enforce-joins-have-class
-                       enforce-views-have-class
-                       enforce-origin))
+                      enforce-sorting
+                      enforce-constraints-have-class
+                      enforce-constraints-have-code
+                      enforce-joins-have-class
+                      enforce-views-have-class
+                      enforce-origin))
 
 (defn make-join [join-path] (str "\n  <join path=\"" join-path "\" style=\"OUTER\"/>"))
 
@@ -131,8 +129,8 @@
   (let [query           (sterilize-query query)
         head-attributes (cond-> {:model (:name model)
                                  :view (clojure.string/join " " (:select query))}
-                                (:constraintLogic query) (assoc :constraintLogic (:constraintLogic query))
-                                (:sortOrder query) (assoc :sortOrder (clojure.string/join " " (flatten (map (juxt :path :direction) (:sortOrder query))))))]
+                          (:constraintLogic query) (assoc :constraintLogic (:constraintLogic query))
+                          (:sortOrder query) (assoc :sortOrder (clojure.string/join " " (flatten (map (juxt :path :direction) (:sortOrder query))))))]
     (str "<query " (stringiy-map head-attributes) ">"
          (when (:joins query) (apply str (map make-join (:joins query))))
 
@@ -151,7 +149,6 @@
                       assoc (path/trim-to-last-class model next-path)
                       {:query (assoc query :select [(str (path/trim-to-last-class model next-path) ".id")])}))
             {} (:select query))))
-
 
 (defn group-views-by-class
   "Group the views of a query by their Class and provide a query
