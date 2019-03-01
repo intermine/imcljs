@@ -15,7 +15,6 @@
                            [lein-doo "0.1.7"]
                            [cheshire "5.7.1"]
                            [aysylu/loom "1.0.0"]]
-            :codox {:language :clojurescript}
             :plugins [[lein-figwheel "0.5.8"]
                       [lein-codox "0.10.5"]
                       [lein-cljfmt "0.6.1"]
