@@ -12,6 +12,7 @@
                            [org.clojure/core.async "0.3.443"]
                            [cljs-http "0.1.42"]
                            [clj-http "3.6.0"]
+                           [lein-doo "0.1.7"]
                            [cheshire "5.7.1"]
                            [aysylu/loom "1.0.0"]]
             :codox {:language :clojurescript}
