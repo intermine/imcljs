@@ -7,11 +7,10 @@
 (def service {:root "www.flymine.org/query"
               :model {:name "genomic"}})
 
-
 (deftest class-keys
   (testing "Able to retrieve class keys"
     (async done
-      (go
-        (let [response (<! (fetch/class-keys service))]
-          (contains? response :BioEntity)
-          (done))))))
+           (go
+             (let [response (<! (fetch/class-keys service))]
+               (contains? response :BioEntity)
+               (done))))))

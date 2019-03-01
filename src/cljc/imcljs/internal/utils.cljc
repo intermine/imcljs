@@ -1,12 +1,9 @@
 (ns imcljs.internal.utils
   #?(:cljs (:require-macros [cljs.core.async.macros :refer [go go-loop]]))
   (:require [clojure.string :refer [split]]
-    #?(:cljs [cljs.core.async :as a :refer [<! >! chan]]
-       :clj
-            [clojure.core.async :as a :refer [<! >! go go-loop chan]])))
-
-
-
+            #?(:cljs [cljs.core.async :as a :refer [<! >! chan]]
+               :clj
+               [clojure.core.async :as a :refer [<! >! go go-loop chan]])))
 
 (def does-not-contain? (complement contains?))
 
@@ -24,8 +21,8 @@
   "Ensures that a url starts with an http protocol and ends with /service"
   [url]
   (cond->> url
-           (missing-http?- url) (str "http://")
-           (missing-service?- url) (append- "/service")))
+    (missing-http?- url) (str "http://")
+    (missing-service?- url) (append- "/service")))
 
 (defn copy-list-query
   [{old-list-name :name old-list-type :type :as old-list-details}]

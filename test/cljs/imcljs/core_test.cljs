@@ -11,8 +11,8 @@
   (let [request (fetch/templates flymine)]
     (testing "flymine returns some spotchecked templates"
       (async done
-        (go
-          (let [res (<! request)]
-            (is (= 1 1))
-            (done)))))))
+             (go
+               (let [res (<! request)]
+                 (is (= 1 1))
+                 (done)))))))
 

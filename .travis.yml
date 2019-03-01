@@ -5,6 +5,19 @@ before_script:
   - wget https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein -O /tmp/lein
   - chmod +x /tmp/lein
   - export PATH=$PATH:/tmp/lein
+  - lein cljfmt check
 
 script:
   - lein doo phantom test once
+  # build API docs
+  - lein codox
+
+# Deploys build API docs:
+deploy:
+  provider: pages
+  skip-cleanup: true
+  github-token: $GITHUB_TOKEN  # Set in the settings page of your repository, as a secure variable
+  keep-history: true
+  local-dir: target/doc
+  on:
+    branch: master

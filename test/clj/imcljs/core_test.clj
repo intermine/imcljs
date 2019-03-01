@@ -13,6 +13,6 @@
   (testing "JVM can perform a POST request"
     (let [{:keys [results statusCode]} (run-query)]
       (and
-        (is (= 200 statusCode)
-            (> 0 (count results)))))))
+       (is (= 200 statusCode)
+           (> 0 (count results)))))))
 

@@ -18,8 +18,7 @@
 
 (def outer-join-query {:constraintLogic "B and C"
                        :from "Gene"
-                       :select [
-                                "secondaryIdentifier"
+                       :select ["secondaryIdentifier"
                                 "symbol"
                                 "homologues.homologue.primaryIdentifier"
                                 "homologues.homologue.symbol"
@@ -27,8 +26,7 @@
                                 "homologues.homologue.organism.name"
                                 "homologues.dataSets.name"
                                 "homologues.homologue.goAnnotation.ontologyTerm.name"
-                                "homologues.homologue.goAnnotation.evidence.code.code"
-                                ]
+                                "homologues.homologue.goAnnotation.evidence.code.code"]
                        :joins ["homologues.homologue.goAnnotation"]
                        :where [{:path "Gene",
                                 :op "LOOKUP",
@@ -37,10 +35,8 @@
                                 :code "B",
                                 :editable true,
                                 :switched "LOCKED",
-                                :switachable false
-                                }
-                               {
-                                :path "homologues.homologue.organism.name",
+                                :switachable false}
+                               {:path "homologues.homologue.organism.name",
                                 :op "=",
                                 :value "Anopheles gambiae",
                                 :code "C",
@@ -51,32 +47,32 @@
 (deftest outer-join
   (testing "Query support for outer joins"
     (async done
-      (go
-        (let [{results :results} (<! (fetch/table-rows service outer-join-query))]
-          (is (some? (not-empty results)))
-          (done))))))
+           (go
+             (let [{results :results} (<! (fetch/table-rows service outer-join-query))]
+               (is (some? (not-empty results)))
+               (done))))))
 
 (deftest deconstruct-by-class
   (testing "Should be able to deconstruct a query into its classes"
     (async done
-      (go
-        (let [model (<! (fetch/model service))]
-          (let [result (query/deconstruct-by-class model normal-query)]
-            (is (= result {:Gene
-                           {"Gene.homologues.homologue"
-                            {:query
-                             {:where [{:path "Gene.symbol", :value "mad", :op "=", :code "A"}]
-                              :from "Gene"
-                              :select ["Gene.homologues.homologue.id"]}}
-                            "Gene"
-                            {:query
-                             {:where [{:path "Gene.symbol", :value "mad", :op "=", :code "A"}]
-                              :from "Gene"
-                              :select ["Gene.id"]}}}
-                           :Organism
-                           {"Gene.organism"
-                            {:query
-                             {:where [{:path "Gene.symbol", :value "mad", :op "=", :code "A"}]
-                              :from "Gene"
-                              :select ["Gene.organism.id"]}}}}))
-            (done)))))))
+           (go
+             (let [model (<! (fetch/model service))]
+               (let [result (query/deconstruct-by-class model normal-query)]
+                 (is (= result {:Gene
+                                {"Gene.homologues.homologue"
+                                 {:query
+                                  {:where [{:path "Gene.symbol", :value "mad", :op "=", :code "A"}]
+                                   :from "Gene"
+                                   :select ["Gene.homologues.homologue.id"]}}
+                                 "Gene"
+                                 {:query
+                                  {:where [{:path "Gene.symbol", :value "mad", :op "=", :code "A"}]
+                                   :from "Gene"
+                                   :select ["Gene.id"]}}}
+                                :Organism
+                                {"Gene.organism"
+                                 {:query
+                                  {:where [{:path "Gene.symbol", :value "mad", :op "=", :code "A"}]
+                                   :from "Gene"
+                                   :select ["Gene.organism.id"]}}}}))
+                 (done)))))))

@@ -104,7 +104,6 @@
   (let [l (last (take-while #(does-not-contain? % :type) (walk model path)))]
     (keyword (or (:referencedType l) (keyword (:name l))))))
 
-
 (defn relationships
   "Returns all relationships (references and collections) for a given string path."
   [model path]
@@ -141,7 +140,6 @@
   [model path]
   (apply merge (map (get-in model [:classes (class model path)]) [:attributes])))
 
-
 (defn class?
   "Returns true if path is a class.
   (class im-model `Gene.diseases`)
@@ -175,10 +173,10 @@
   "Returns a path as a strong"
   ([model path & [exclude-root?]]
    (reduce
-     (fn [total next]
-       (str total (if total " > ") (or (:displayName next) (:name next))))
-     nil
-     (if exclude-root? (rest (walk model path)) (walk model path)))))
+    (fn [total next]
+      (str total (if total " > ") (or (:displayName next) (:name next))))
+    nil
+    (if exclude-root? (rest (walk model path)) (walk model path)))))
 
 (defn one-of? [col value]
   (some? (some #{value} col)))
