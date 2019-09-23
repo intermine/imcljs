@@ -3,10 +3,9 @@
   (:require [imcljs.internal.io :refer [restful]]
             [imcljs.fetch :as fetch :refer [lists]]
             [imcljs.internal.utils :refer [copy-list-query <<!]]
-    #?(:cljs [cljs.core.async :as a :refer [<! >! chan]]
-       :clj
-            [clojure.core.async :as a :refer [<! >! go chan]])))
-
+            #?(:cljs [cljs.core.async :as a :refer [<! >! chan]]
+               :clj
+               [clojure.core.async :as a :refer [<! >! go chan]])))
 
 (defn im-list
   "Creates a list using a plain text string of identifiers"
@@ -50,7 +49,6 @@
                                               :tags (if (coll? tags) (interpose ";" tags) tags)
                                               :format "json"}
                                              options)))
-
 
 (defn im-list-copy
   "Copy a list by name"

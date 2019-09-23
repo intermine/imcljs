@@ -19,13 +19,11 @@
   [url options]
   (client/get url options))
 
-
 (def username-password (juxt :username :password))
 
 (defn wrap-defaults
   ([] (wrap-defaults {}))
   ([m] (merge default-options m)))
-
 
 (defn basic-auth-xform
   "Transform a :basic-auth username/password map into a vec"
@@ -60,8 +58,7 @@
 (defn wrap-basic-auth [request]
   (if (contains? request :basic-auth)
     (update request :basic-auth (juxt :username :password))
-    request)
-  )
+    request))
 
 (defn get-body-wrapper-
   [path {:keys [root token model]} options & [xform]]
@@ -78,18 +75,20 @@
 (defn post-body-wrapper-
   [path {:keys [root token model]} options & [xform]]
   (parse-response xform (client/post (url root path)
-                                    (-> options ; Blank request map
+                                     (-> options ; Blank request map
                                         ;(wrap-accept)
-                                        (wrap-request-defaults xform) ; Add defaults such as with-credentials false?
+                                         (wrap-request-defaults xform) ; Add defaults such as with-credentials false?
                                         ; If we have basic auth options then convert them from the cljs-http to clj-http format
-                                        (wrap-post-defaults options model)
-                                        wrap-basic-auth
+                                         (wrap-post-defaults options model)
+                                         wrap-basic-auth
                                         ;(wrap-post-defaults options model) ; Add form params
-                                        (wrap-auth token)
-                                        (merge {:as :json})))))
+                                         (wrap-auth token)
+                                         (merge {:as :json})))))
 
 
 ; Perform an HTTP request
+
+
 (defn request
   [method path {:keys [root token model] :as service} options & [xform]]
   (let [http-fn (get method-map method)]
@@ -99,6 +98,8 @@
 ; We're using a multimethod with just one default method because clj-http
 ; seems to handle parameters generically regardless of protocol.
 ; However, cljs-http and therefore uses a multimethod to wrap parameters appropriately
+
+
 (defmulti restful (fn [method & args] method))
 
 (defmethod restful :raw [_ method path {:keys [root token model] :as service} request & [xform]]

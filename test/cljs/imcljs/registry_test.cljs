@@ -10,10 +10,10 @@
     (testing "registry should return some InterMines, but there should be fewer
               prod than prod+dev mines"
       (async done
-             (go
-               (let [prod (<! prod-mines)
-                     dev (<! dev-and-prod-mines)]
-                 (is (<
-                      (count (:instances (:body prod)))
-                      (count (:instances (:body dev)))))
-                 (done)))))))
+        (go
+          (let [prod (<! prod-mines)
+                dev (<! dev-and-prod-mines)]
+            (is (<
+                 (count (:instances (:body prod)))
+                 (count (:instances (:body dev)))))
+            (done)))))))

@@ -3,9 +3,9 @@
   (:require [imcljs.internal.io :refer [restful]]
             [imcljs.fetch :as fetch]
             [imcljs.internal.utils :refer [copy-list-query]]
-    #?(:cljs [cljs.core.async :refer [<! >! chan]]
-       :clj
-            [clojure.core.async :refer [<! >! go chan]])))
+            #?(:cljs [cljs.core.async :refer [<! >! chan]]
+               :clj
+               [clojure.core.async :refer [<! >! go chan]])))
 
 (defn query-to-list
   "Save the results of a query to a list"

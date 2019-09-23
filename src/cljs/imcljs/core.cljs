@@ -72,11 +72,9 @@
 (defn on-js-reload []
   (go
     (let [model (<! (fetch/model service))]
-      (go (js/console.log "done" (<! (fetch/code service model {:lang  "js"
-                                                                :query basic-query})))))))
-
-
-
-
-
-
+      (go
+        (js/console.log "done"
+                        (<! (fetch/code service
+                                        model
+                                        {:lang "js"
+                                         :query basic-query})))))))
