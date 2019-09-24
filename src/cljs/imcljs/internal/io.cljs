@@ -17,12 +17,6 @@
 ;      ;(close! request-chan)
 ;      (if xform (xform response) response))))
 
-(defn get-plain
-  "most methods assume communication with an InterMine.
-   This method allows comms with any server"
-  [url options]
-  (get url options))
-
 (defn post-body-wrapper-
   "Returns the results of queries as table rows."
   [path {:keys [root token model]} options & [xform]]

@@ -1,6 +1,6 @@
 (ns imcljs.fetch
   #?(:cljs (:require-macros [cljs.core.async.macros :refer [go go-loop]]))
-  (:require [imcljs.internal.io :refer [restful get-plain]]
+  (:require [imcljs.internal.io :refer [restful]]
     [imcljs.query :as im-query]
     #?(:cljs [cljs.core.async :refer [<! >! chan timeout]]
        :clj
@@ -89,7 +89,7 @@
   [service & [options]]
   ;;remove any old tokens passed in as they'll cause an auth failure
   (let [token-free-service (dissoc service :token)]
-  (restful :get "/session" token-free-service options :token)))
+   (restful :get "/session" token-free-service options :token)))
 
 ; Widgets
 
@@ -190,8 +190,7 @@
   "Returns list of InterMines from the InterMine registry. dev-mines? needs to
    be set to true if you want to return non-prod mines, or otherwise set to false"
   [dev-mines?]
-  (get-plain "http://registry.intermine.org/service/instances"
-             (if dev-mines?
-               {:with-credentials? false
-                :query-params {:mines "all"}}
-               {:with-credentials? false})))
+  (restful :raw :get "/instances"
+           {:root "http://registry.intermine.org/service"}
+           (when dev-mines? {:query-params {:mines "all"}})
+           :instances))
