@@ -55,7 +55,6 @@
     (update request :basic-auth (juxt :username :password))
     request))
 
-
 (defn get-body-wrapper-
   [path {:keys [root token model]} options & [xform]]
   (parse-response xform (client/get (url root path)
@@ -94,6 +93,7 @@
 ; We're using a multimethod with just one default method because clj-http
 ; seems to handle parameters generically regardless of protocol.
 ; However, cljs-http and therefore uses a multimethod to wrap parameters appropriately
+
 
 (defmulti restful
   (fn [method & args]

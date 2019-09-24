@@ -2,13 +2,14 @@
   #?(:cljs (:require-macros [cljs.core.async.macros :refer [go go-loop]]))
 
   (:require [imcljs.internal.io :refer [restful]]
-    [imcljs.query :as im-query]
-    #?(:cljs [cljs.core.async :refer [<! >! chan timeout]]
-       :clj
-            [clojure.core.async :refer [<! >! timeout go go-loop chan]])))
+            [imcljs.query :as im-query]
+            #?(:cljs [cljs.core.async :refer [<! >! chan timeout]]
+               :clj
+               [clojure.core.async :refer [<! >! timeout go go-loop chan]])))
 
 
 ; Quicksearch
+
 
 (defn quicksearch
   "Returns quicksearch results."
@@ -95,6 +96,7 @@
 
 
 ; Widgets
+
 
 (defn widgets
   "Returns list of widgets available for a given mine"
