@@ -30,8 +30,8 @@
                 copied-list    (<! (save/im-list-copy service new-list-name duplicate-name))]
             ; Confirm that the duplicate name string matches the
             (is (and
-                  (= duplicate-name (:listName copied-list))
-                  (= true (:wasSuccessful copied-list))))
+                 (= duplicate-name (:listName copied-list))
+                 (= true (:wasSuccessful copied-list))))
             (done)))))))
 
 (deftest rename-list
@@ -48,8 +48,8 @@
                 renamed-list  (<! (save/im-list-rename service new-list-name new-name))]
             ; Confirm that the renamed list name matches
             (is (and
-                  (= new-name (:listName renamed-list))
-                  (= true (:wasSuccessful renamed-list))))
+                 (= new-name (:listName renamed-list))
+                 (= true (:wasSuccessful renamed-list))))
             (done)))))))
 
 (deftest create-list
@@ -62,8 +62,8 @@
                 new-list  (<! (save/im-list service list-name "Gene" "zen mad"))]
             ; Confirm that the renamed list name matches
             (is (and
-                  (= list-name (:listName new-list))
-                  (= true (:wasSuccessful new-list))))
+                 (= list-name (:listName new-list))
+                 (= true (:wasSuccessful new-list))))
             (done)))))))
 
 (deftest delete-list
@@ -72,12 +72,12 @@
       (go
         (let [service (assoc service :token (<! (fetch/session service)))]
           (let [delete-status (->>
-                                (save/im-list service (gensym) "Gene" "eve thor zen")
-                                <!
-                                :listName
-                                (save/im-list-delete service)
-                                <!
-                                :wasSuccessful)]
+                               (save/im-list service (gensym) "Gene" "eve thor zen")
+                               <!
+                               :listName
+                               (save/im-list-delete service)
+                               <!
+                               :wasSuccessful)]
             (is (true? delete-status)))
           (done))))))
 
@@ -87,18 +87,18 @@
       (go
         (let [service (assoc service :token (<! (fetch/session service)))]
           (let [delete-status-col (->>
-                                    (repeatedly gensym)
-                                    (take 3)
-                                    (map (fn [name] (save/im-list service name "Gene" "eve thor zen")))
-                                    <<!
-                                    <!
-                                    (map :listName)
-                                    (save/im-list-delete service)
-                                    <!
-                                    (map :wasSuccessful))]
+                                   (repeatedly gensym)
+                                   (take 3)
+                                   (map (fn [name] (save/im-list service name "Gene" "eve thor zen")))
+                                   <<!
+                                   <!
+                                   (map :listName)
+                                   (save/im-list-delete service)
+                                   <!
+                                   (map :wasSuccessful))]
             (is (and
-                  (some? (not-empty delete-status-col))
-                  (every? true? delete-status-col))))
+                 (some? (not-empty delete-status-col))
+                 (every? true? delete-status-col))))
           (done))))))
 
 

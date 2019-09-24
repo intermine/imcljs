@@ -1,12 +1,15 @@
 (ns imcljs.fetch
   #?(:cljs (:require-macros [cljs.core.async.macros :refer [go go-loop]]))
+
   (:require [imcljs.internal.io :refer [restful]]
-    [imcljs.query :as im-query]
-    #?(:cljs [cljs.core.async :refer [<! >! chan timeout]]
-       :clj
-            [clojure.core.async :refer [<! >! timeout go go-loop chan]])))
+            [imcljs.query :as im-query]
+            #?(:cljs [cljs.core.async :refer [<! >! chan timeout]]
+               :clj
+               [clojure.core.async :refer [<! >! timeout go go-loop chan]])))
+
 
 ; Quicksearch
+
 
 (defn quicksearch
   "Returns quicksearch results."
@@ -89,9 +92,11 @@
   [service & [options]]
   ;;remove any old tokens passed in as they'll cause an auth failure
   (let [token-free-service (dissoc service :token)]
-   (restful :get "/session" token-free-service options :token)))
+    (restful :get "/session" token-free-service options :token)))
+
 
 ; Widgets
+
 
 (defn widgets
   "Returns list of widgets available for a given mine"
@@ -107,6 +112,7 @@
 
 
 ; Versions
+
 
 (defn version-web-service
   "Returns the version of the InterMine WebService being run, e.g. '27'"
@@ -134,6 +140,7 @@
 
 ; ID Resolution
 
+
 (defn fetch-id-resolution-job-results
   "Fetches the results of an id resolution job"
   [service uid]
@@ -149,10 +156,10 @@
   [service {:keys [identifiers type case-sensitive wild-cards extra] :as options}]
   (restful :post-body "/ids" service
            {:body (cond-> {:identifiers identifiers}
-                          type (assoc :type type)
-                          case-sensitive (assoc :caseSensitive true)
-                          wild-cards (assoc :wildCards true)
-                          extra (assoc :extra extra))
+                    type (assoc :type type)
+                    case-sensitive (assoc :caseSensitive true)
+                    wild-cards (assoc :wildCards true)
+                    extra (assoc :extra extra))
             :headers {"Content-Type" "application/json"}}))
 
 (defn resolve-identifiers

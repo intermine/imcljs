@@ -18,8 +18,7 @@
 
 (def outer-join-query {:constraintLogic "B and C"
                        :from "Gene"
-                       :select [
-                                "secondaryIdentifier"
+                       :select ["secondaryIdentifier"
                                 "symbol"
                                 "homologues.homologue.primaryIdentifier"
                                 "homologues.homologue.symbol"
@@ -27,8 +26,7 @@
                                 "homologues.homologue.organism.name"
                                 "homologues.dataSets.name"
                                 "homologues.homologue.goAnnotation.ontologyTerm.name"
-                                "homologues.homologue.goAnnotation.evidence.code.code"
-                                ]
+                                "homologues.homologue.goAnnotation.evidence.code.code"]
                        :joins ["homologues.homologue.goAnnotation"]
                        :where [{:path "Gene",
                                 :op "LOOKUP",
@@ -37,10 +35,8 @@
                                 :code "B",
                                 :editable true,
                                 :switched "LOCKED",
-                                :switachable false
-                                }
-                               {
-                                :path "homologues.homologue.organism.name",
+                                :switachable false}
+                               {:path "homologues.homologue.organism.name",
                                 :op "=",
                                 :value "Anopheles gambiae",
                                 :code "C",

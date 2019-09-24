@@ -12,9 +12,9 @@
 (deftest anon-token
   (testing "Able to retrieve anon token, even if passed an old/expired token"
     (async done
-           (go
-             (let [response (<! (fetch/session service))]
+      (go
+        (let [response (<! (fetch/session service))]
                ;; InterMine returns a 401 if you request a new token and pass an
                ;; old/bad/expired token. We can work around it though! 
-               (is (not (= 401 (:status response))))
-               (done))))))
+          (is (not (= 401 (:status response))))
+          (done))))))
