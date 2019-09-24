@@ -18,6 +18,7 @@
             [org.clojure/core.unify "0.5.7"]
             [lein-cljfmt "0.6.1"]
             [lein-codox "0.10.7"]]
+  :aliases {"format" ["cljfmt" "fix"]}
 
   :source-paths ["src/cljc" "src/cljs" "src/clj" "test/clj" "test/cljs"]
 
