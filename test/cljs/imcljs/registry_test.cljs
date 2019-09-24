@@ -13,8 +13,6 @@
         (go
           (let [prod (<! prod-mines)
                 dev (<! dev-and-prod-mines)]
-            (is (<
-                 (count (:instances (:body prod)))
-                 (count (:instances (:body dev)))))
+            (is (< (count prod) (count dev)))
             (done)))))))
 
