@@ -43,3 +43,16 @@
       (recur (conj coll (<! (first chans)))
              (rest chans))
       coll)))
+
+(defn assert-args
+  [method & args]
+  (let [[path service options & [xform]] (cond->> args
+                                           (= method :raw) (drop 1))]
+    (assert ((every-pred string? not-empty) path)
+            "path should be a non-empty string.")
+    (assert ((every-pred string? not-empty) (:root service))
+            "service should always have a root URL.")
+    (assert ((some-fn map? nil?) options)
+            "options should be a map if non-nil.")
+    (assert ((some-fn ifn? nil?) xform)
+            "xform should be a callable function if non-nil.")))

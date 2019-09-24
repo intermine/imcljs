@@ -4,7 +4,8 @@
             [imcljs.query :as q]
             [imcljs.internal.defaults :refer [url wrap-request-defaults
                                               wrap-post-defaults
-                                              wrap-auth]]))
+                                              wrap-auth]]
+            [imcljs.internal.utils :refer [assert-args]]))
 
 (def method-map {:get client/get
                  :post client/post
@@ -60,8 +61,8 @@
 (defn wrap-basic-auth [request]
   (if (contains? request :basic-auth)
     (update request :basic-auth (juxt :username :password))
-    request)
-  )
+    request))
+
 
 (defn get-body-wrapper-
   [path {:keys [root token model]} options & [xform]]
@@ -99,7 +100,10 @@
 ; We're using a multimethod with just one default method because clj-http
 ; seems to handle parameters generically regardless of protocol.
 ; However, cljs-http and therefore uses a multimethod to wrap parameters appropriately
-(defmulti restful (fn [method & args] method))
+(defmulti restful
+  (fn [method & args]
+    (apply assert-args method args)
+    method))
 
 (defmethod restful :raw [_ method path {:keys [root token model] :as service} request & [xform]]
   (let [http-fn (get method-map method)]

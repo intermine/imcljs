@@ -1,6 +1,6 @@
 (ns imcljs.internal.io
   (:require [cljs-http.client :refer [post get delete]]
-            [imcljs.internal.utils :refer [scrub-url]]
+            [imcljs.internal.utils :refer [assert-args]]
             [imcljs.internal.defaults
              :refer [url wrap-get-defaults wrap-request-defaults
                      wrap-post-defaults wrap-auth wrap-accept
@@ -77,7 +77,10 @@
              (wrap-request-defaults xform) ; Add defaults such as with-credentials false?
              (assoc :basic-auth basic-auth-params)))))
 
-(defmulti restful (fn [method & args] method))
+(defmulti restful
+  (fn [method & args]
+    (apply assert-args method args)
+    method))
 
 ;(defmethod restful :raw [method path {:keys [root token model] :as service} request & [xform]]
 ;  (let [http-fn (case method :get get :post post :delete delete)]
