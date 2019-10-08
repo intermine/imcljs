@@ -198,6 +198,6 @@
    be set to true if you want to return non-prod mines, or otherwise set to false"
   [dev-mines?]
   (restful :raw :get "/instances"
-           {:root "http://registry.intermine.org/service"}
+           {:root "https://registry.intermine.org/service"}
            (when dev-mines? {:query-params {:mines "all"}})
            :instances))
