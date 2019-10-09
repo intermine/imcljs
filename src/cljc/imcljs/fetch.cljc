@@ -149,7 +149,7 @@
 (defn fetch-id-resolution-job-status
   "Fetches the status of an id resolution job"
   [service uid]
-  (restful :get (str "/ids/" uid "/status") service))
+  (restful :get (str "/ids/" uid "/status") service {}))
 
 (defn fetch-id-resolution-job
   "Starts an id resolution job"
@@ -164,18 +164,26 @@
 
 (defn resolve-identifiers
   "Resolves identifiers. Automatically handles polling"
-  [service {:keys [identifiers type case-sensitive wild-cards extra timeout-ms] :as options}]
+  [service {:keys [timeout-ms] :as options}]
   (let [return-chan (chan 1)]
-    (go (let [job (<! (fetch-id-resolution-job service options))]
-          (go-loop [ms 100]
-            (let [{:keys [status uid]} (<! (fetch-id-resolution-job-status service (:uid job)))]
-              (if (= "SUCCESS" status)
-                (let [results (<! (fetch-id-resolution-job-results service (:uid job)))]
-                  (>! return-chan results))
-                (do
-                  (<! (timeout ms))
-                  (when (< ms (or timeout-ms 30000))
-                    (recur (min 1000 (* ms 1.5))))))))))
+    (go (let [{:keys [uid] :as job}
+              (<! (fetch-id-resolution-job service options))]
+          (if (not-empty uid)
+            (loop [ms 100
+                   total-ms 0]
+              (let [{:keys [status] :as res}
+                    (<! (fetch-id-resolution-job-status service uid))]
+                (case status
+                  "SUCCESS" (let [results
+                                  (<! (fetch-id-resolution-job-results service uid))]
+                              (>! return-chan results))
+                  "RUNNING" (do
+                              (<! (timeout ms))
+                              (when (< total-ms (or timeout-ms 30000))
+                                (recur (min 1000 (* ms 1.5))
+                                       (+ total-ms ms))))
+                  (>! return-chan res))))
+            (>! return-chan job))))
     return-chan))
 
 ; Code Generation
