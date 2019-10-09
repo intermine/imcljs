@@ -21,7 +21,7 @@
   "Ensures that a url starts with an http protocol and ends with /service"
   [url]
   (cond->> url
-    (missing-http?- url) (str "http://")
+    (missing-http?- url) (str "https://")
     (missing-service?- url) (append- "/service")))
 
 (defn copy-list-query
