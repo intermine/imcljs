@@ -29,8 +29,9 @@
       (-> request :body xform))))
 
 (defn wrap-request-defaults [m & [xform]]
-  (assoc m :with-credentials? false
-         :channel (chan 1 (map (if xform (transform-if-successful xform) :body)))))
+  (assoc m
+         :with-credentials? false
+         :channel (chan 1 (map (transform-if-successful (or xform identity))))))
 
 (defn wrap-post-defaults [request options & [model]]
   (if options
