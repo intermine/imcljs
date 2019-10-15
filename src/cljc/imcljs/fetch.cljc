@@ -54,16 +54,16 @@
   values, so we avoid sending the massive request here instead."
   [service query path & [limit]]
   (let [return-chan (chan)
-        <!rows-size #(<! (rows service query {:summaryPath path :size % :format "jsonrows"}))]
+        rows-size #(rows service query {:summaryPath path :size % :format "jsonrows"})]
     (go
       ;; We send an initial size=1 request to check how many values there are.
-      (let [{unique-count :uniqueValues :as res} (<!rows-size 1)]
+      (let [{unique-count :uniqueValues :as res} (<! (rows-size 1))]
         (cond
           ;; If there's only 1 value, we simply return our initial response.
           (= unique-count 1)           (>! return-chan res)
           ;; If there's more, we request the rest of them...
           (or (not limit)
-              (<= unique-count limit)) (>! return-chan (<!rows-size limit))
+              (<= unique-count limit)) (>! return-chan (<! (rows-size limit)))
           ;; ...except in the case where there are more than our limit.
           :else                        (>! return-chan false))))
     return-chan))
