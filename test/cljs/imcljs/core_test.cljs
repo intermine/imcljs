@@ -4,7 +4,7 @@
             [cljs.core.async :refer [<!]]
             [imcljs.fetch :as fetch]))
 
-(def flymine {:root  "www.flymine.org/query"
+(def flymine {:root  "https://www.flymine.org/flymine"
               :model {:name "genomic"}})
 
 (deftest templates
