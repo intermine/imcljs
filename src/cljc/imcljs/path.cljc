@@ -1,4 +1,5 @@
 (ns imcljs.path
+  (:refer-clojure :exclude [class class?])
   (:require [imcljs.internal.utils :refer [does-not-contain?]]
             [clojure.string :refer [split join]]))
 
