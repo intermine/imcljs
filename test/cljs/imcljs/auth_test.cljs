@@ -4,7 +4,7 @@
             [cljs.core.async :refer [<!]]
             [imcljs.fetch :as fetch]))
 
-(def service {:root "www.flymine.org/query"
+(def service {:root "https://www.flymine.org/flymine"
               :model {:name "genomic"}
               ;;imcljs should cope with an expired token just fine
               :token "THIS_TOKEN_IS_EXPIRED"})

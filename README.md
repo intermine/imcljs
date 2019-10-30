@@ -21,7 +21,7 @@ imcljs returns channels so you'll also want to include core.async
 With the exception of the fetch/registry function, all imcljs functions expect a map as their first parameter containing a mandatory `:root` key and two semi-optional keys, `:token` and `:model`.
 
 ```clj
-(def flymine {:root  "www.flymine.org/query"
+(def flymine {:root  "https://www.flymine.org/flymine"
               :token nil ; Optional parameter for authentication
               :model "genomic" ; Required by some functions, such as executing a query
               })

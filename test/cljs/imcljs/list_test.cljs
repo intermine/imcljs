@@ -7,7 +7,7 @@
             [imcljs.save :as save]
             [imcljs.internal.utils :refer [<<!]]))
 
-(def service {:root "www.flymine.org/query"
+(def service {:root "https://www.flymine.org/flymine"
               :model {:name "genomic"}})
 
 (def flymine-query {:from "Gene"

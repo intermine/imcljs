@@ -2,7 +2,7 @@
   (:require [cljs.test :refer-macros [deftest testing is]]
             [imcljs.internal.io :refer [restful]]))
 
-(def service {:root "www.flymine.org/query"
+(def service {:root "https://www.flymine.org/flymine"
               :model {:name "genomic"}})
 
 (def args [:get "/lists" service {:name "banana"} (comp first :lists)])

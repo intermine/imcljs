@@ -49,14 +49,23 @@
 
 (defn unique-values
   "Fetches unique values for a path within a query. Providing a limit shortcircuits the request
-  and returns false if the unique values exceed the limit"
+  and returns false if the unique values exceed the limit. This is primarily for the column
+  summary in im-tables-3, where we don't want to summarize columns with more than limit=1000
+  values, so we avoid sending the massive request here instead."
   [service query path & [limit]]
-  (let [return-chan (chan)]
+  (let [return-chan (chan)
+        rows-size #(rows service query {:summaryPath path :size % :format "jsonrows"})]
     (go
-      (let [{unique-count :uniqueValues} (<! (rows service query {:summaryPath path :size 1 :format "jsonrows"}))]
-        (if (or (not limit) (<= unique-count limit))
-          (>! return-chan (<! (rows service query {:summaryPath path :size limit :format "jsonrows"})))
-          (>! return-chan false))))
+      ;; We send an initial size=1 request to check how many values there are.
+      (let [{unique-count :uniqueValues :as res} (<! (rows-size 1))]
+        (cond
+          ;; If there's only 1 value, we simply return our initial response.
+          (= unique-count 1)           (>! return-chan res)
+          ;; If there's more, we request the rest of them...
+          (or (not limit)
+              (<= unique-count limit)) (>! return-chan (<! (rows-size limit)))
+          ;; ...except in the case where there are more than our limit.
+          :else                        (>! return-chan false))))
     return-chan))
 
 ; Assets

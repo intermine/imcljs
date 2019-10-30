@@ -6,7 +6,7 @@
             [imcljs.fetch :as fetch]
             [imcljs.query :as query]))
 
-(def service {:root "www.flymine.org/query"
+(def service {:root "https://www.flymine.org/flymine"
               :model {:name "genomic"}})
 
 (def normal-query {:from "Gene"
