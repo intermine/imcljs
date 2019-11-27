@@ -24,6 +24,12 @@
   (restful :post "/login" service {:username username
                                    :password password}))
 
+(defn logout
+  "Logout the authenticated user, invalidating the token provided in their
+  Authorization header."
+  [service]
+  (restful :get "/logout" service {}))
+
 (defn who-am-i?
   "Given a token return user information"
   [service token & [options]]
