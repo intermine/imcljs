@@ -16,6 +16,14 @@
                     :basic-auth [username password]})
            (comp :token first :tokens)))
 
+(defn login
+  "Login the user using their username and password. Returns their new API token.
+  If :token is present in `service`, it will get added to the Authorization header
+  so that the anonymously saved lists gets merged into the users account."
+  [service username password]
+  (restful :post "/login" service {:username username
+                                   :password password}))
+
 (defn who-am-i?
   "Given a token return user information"
   [service token & [options]]
