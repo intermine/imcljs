@@ -50,6 +50,13 @@
                                               :format "json"}
                                              options)))
 
+(defn im-list-remove-tag
+  [service name tags & [options]]
+  (restful :delete "/list/tags" service (merge {:name name
+                                                :tags (if (coll? tags) (interpose ";" tags) tags)
+                                                :format "json"}
+                                               options)))
+
 (defn im-list-copy
   "Copy a list by name"
   [service old-name new-name & [options]]
