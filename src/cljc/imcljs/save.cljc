@@ -12,6 +12,12 @@
   [service name type identifiers & [options]]
   (restful :post-body (str "/lists?name=" name "&type=" type) service {:body identifiers :headers {"Content-Type" "text/plain"}}))
 
+(defn im-list-update
+  "Update an existing list. Currently, only updating the description by specifying
+  `:newDescription` in the `options` map is supported."
+  [service name & [options]]
+  (restful :put "/lists" service (merge {:name name :format "json"} options)))
+
 (defn im-list-delete
   "Delete one or name lists."
   [service names & [options]]
