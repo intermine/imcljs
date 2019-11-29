@@ -34,3 +34,8 @@
   "Given a token return user information"
   [service token & [options]]
   (restful :get "/user/whoami" service (merge {:token token} options) :user))
+
+(defn change-password
+  "Changes the password of an authenticated user."
+  [service new-password]
+  (restful :post "/user" service {:newPassword new-password}))
