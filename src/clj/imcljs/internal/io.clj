@@ -82,7 +82,6 @@
                                    (wrap-auth token)
                                    (merge {:as :json})))))
 
-
 (defn put-body-wrapper-
   [path {:keys [root token model]} options & [xform]]
   (parse-response (or xform identity)
