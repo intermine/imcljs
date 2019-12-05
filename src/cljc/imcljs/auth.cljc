@@ -39,3 +39,9 @@
   "Changes the password of an authenticated user."
   [service new-password]
   (restful :post "/user" service {:newPassword new-password}))
+
+(defn register
+  "Register a new user account."
+  [service username password & [options]]
+  (let [params {:name username :password password}]
+    (restful :post "/users" service (merge params options) :user)))
