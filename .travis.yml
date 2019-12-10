@@ -1,6 +1,7 @@
 language: java
 sudo: true
 jdk: openjdk9
+services: postgresql
 
 before_script:
   # Setup biotestmine to test against
