@@ -1,6 +1,6 @@
 language: java
 sudo: true
-jdk: openjdk9
+jdk: openjdk8
 services: postgresql
 
 before_script:
@@ -17,9 +17,9 @@ before_script:
   - lein cljfmt check
 
 script:
-  - lein with-profile +java9 doo phantom test once
+  - lein doo phantom test once
   # build API docs
-  - lein with-profile +java9 codox
+  - lein codox
   
 # Deploys build API docs:
 deploy:
