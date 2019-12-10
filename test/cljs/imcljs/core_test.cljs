@@ -1,18 +1,19 @@
 (ns imcljs.core-test
-  (:require-macros [cljs.core.async.macros :refer [go go-loop]])
+  (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [cljs.test :refer-macros [async deftest testing is]]
             [cljs.core.async :refer [<!]]
+            [imcljs.env :refer [service]]
             [imcljs.fetch :as fetch]))
 
-(def flymine {:root  "https://www.flymine.org/flymine"
-              :model {:name "genomic"}})
-
 (deftest templates
-  (let [request (fetch/templates flymine)]
-    (testing "flymine returns some spotchecked templates"
+  (let [request (fetch/templates service)]
+    (testing "mine returns some spotchecked templates"
       (async done
         (go
-          (let [res (<! request)]
-            (is (= 1 1))
+          (let [{:keys [All_Proteins_In_Organism_To_Publications
+                        Gene_Protein
+                        Organism_Protein]} (<! request)]
+            (is (every? not-empty [All_Proteins_In_Organism_To_Publications
+                                   Gene_Protein
+                                   Organism_Protein]))
             (done)))))))
-

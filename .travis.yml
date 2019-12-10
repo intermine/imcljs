@@ -1,8 +1,12 @@
 language: java
+sudo: true
 jdk: openjdk9
-sudo: required
 
 before_script:
+  # Setup biotestmine to test against
+  - git clone https://github.com/intermine/ci-scripts
+  - (cd ci-scripts && bash init-biotestmine.sh)
+  # Install lein - required to build the project
   - wget https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein -O /tmp/lein
   - chmod +x /tmp/lein
   - export PATH=$PATH:/tmp/lein
