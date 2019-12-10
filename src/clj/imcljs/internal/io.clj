@@ -85,16 +85,16 @@
 (defn put-body-wrapper-
   [path {:keys [root token model]} options & [xform]]
   (parse-response (or xform identity)
-                  (client/post (url root path)
-                               (-> options ; Blank request map
-                                  ;(wrap-accept)
-                                   (wrap-request-defaults xform) ; Add defaults such as with-credentials false?
-                                  ; If we have basic auth options then convert them from the cljs-http to clj-http format
-                                   (wrap-put-defaults options)
-                                   wrap-basic-auth
-                                  ;(wrap-post-defaults options model) ; Add form params
-                                   (wrap-auth token)
-                                   (merge {:as :json})))))
+                  (client/put (url root path)
+                              (-> options ; Blank request map
+                                 ;(wrap-accept)
+                                  (wrap-request-defaults xform) ; Add defaults such as with-credentials false?
+                                 ; If we have basic auth options then convert them from the cljs-http to clj-http format
+                                  (wrap-put-defaults options)
+                                  wrap-basic-auth
+                                 ;(wrap-post-defaults options model) ; Add form params
+                                  (wrap-auth token)
+                                  (merge {:as :json})))))
 
 ; Perform an HTTP request
 
