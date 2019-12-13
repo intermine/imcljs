@@ -2,10 +2,8 @@
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [cljs.test :refer-macros [async deftest testing is use-fixtures]]
             [cljs.core.async :refer [<!]]
+            [imcljs.env :refer [service]]
             [imcljs.fetch :as fetch]))
-
-(def service {:root "https://www.flymine.org/flymine"
-              :model {:name "genomic"}})
 
 (deftest class-keys
   (testing "Able to retrieve class keys"

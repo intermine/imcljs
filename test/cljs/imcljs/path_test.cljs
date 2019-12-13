@@ -2,19 +2,17 @@
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [cljs.test :refer-macros [async deftest testing is use-fixtures]]
             [cljs.core.async :refer [<!]]
+            [imcljs.env :refer [service]]
             [imcljs.path :as path]
             [imcljs.fetch :as fetch]))
-
-(def service {:root  "https://www.flymine.org/flymine"
-              :model {:name "genomic"}})
 
 (deftest walk-subclass
   (testing "Should be able to walk a path that with"
     (async done
       (go
         (let [model (<! (fetch/model service))]
-          (let [walked (path/walk model "Gene.homologues.homologue")]
-            (is (= (map :name walked) '("Gene" "Homologue" "Gene")))
+          (let [walked (path/walk model "Gene.proteins.genes")]
+            (is (= (map :name walked) '("Gene" "Protein" "Gene")))
             (done)))))))
 
 (deftest walk-subclasses
@@ -22,8 +20,8 @@
     (async done
       (go
         (let [model (<! (fetch/model service))]
-          (let [walked (path/walk model "Gene.downstreamIntergenicRegion.adjacentGenes.microArrayResults.affyCall")]
-            (is (= (map :name walked) '("Gene" "IntergenicRegion" "Gene" "MicroArrayResult" "affyCall")))
+          (let [walked (path/walk model "Gene.proteins.genes.ontologyAnnotations.ontologyTerm.name")]
+            (is (= (map :name walked) '("Gene" "Protein" "Gene" "OntologyAnnotation" "OntologyTerm" "name")))
             (done)))))))
 
 (deftest walk-root
@@ -60,9 +58,9 @@
     (async done
       (go
         (let [model (<! (fetch/model service))
-              path  "Gene.homologues.homologue.name"]
+              path  "Gene.proteins.genes.symbol"]
           (is (= :Gene (path/class model path)))
-          (is (= "Gene.homologues.homologue" (path/trim-to-last-class model path)))
+          (is (= "Gene.proteins.genes" (path/trim-to-last-class model path)))
           (done))))))
 
 (deftest path-subclasses
@@ -70,8 +68,8 @@
     (async done
       (go
         (let [model (<! (fetch/model service))
-              path  "Gene.downstreamIntergenicRegion.adjacentGenes.microArrayResults.affyCall"]
-          (is (= :MicroArrayResult (path/class model path)))
-          (is (= "Gene.downstreamIntergenicRegion.adjacentGenes.microArrayResults"
+              path  "Gene.proteins.genes.ontologyAnnotations.ontologyTerm.name"]
+          (is (= :OntologyTerm (path/class model path)))
+          (is (= "Gene.proteins.genes.ontologyAnnotations.ontologyTerm"
                  (path/trim-to-last-class model path)))
           (done))))))

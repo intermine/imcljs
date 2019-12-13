@@ -1,8 +1,13 @@
 language: java
-jdk: openjdk9
-sudo: required
+sudo: true
+jdk: openjdk8
+services: postgresql
 
 before_script:
+  # Setup biotestmine to test against
+  - git clone https://github.com/intermine/ci-scripts
+  - (cd ci-scripts && bash init-biotestmine.sh)
+  # Install lein - required to build the project
   - wget https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein -O /tmp/lein
   - chmod +x /tmp/lein
   - export PATH=$PATH:/tmp/lein
@@ -12,9 +17,9 @@ before_script:
   - lein cljfmt check
 
 script:
-  - lein with-profile +java9 doo phantom test once
+  - lein doo phantom test once
   # build API docs
-  - lein with-profile +java9 codox
+  - lein codox
   
 # Deploys build API docs:
 deploy:
