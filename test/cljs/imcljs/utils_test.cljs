@@ -1,9 +1,7 @@
 (ns imcljs.utils-test
   (:require [cljs.test :refer-macros [deftest testing is]]
+            [imcljs.env :refer [service]]
             [imcljs.internal.io :refer [restful]]))
-
-(def service {:root "https://www.flymine.org/flymine"
-              :model {:name "genomic"}})
 
 (def args [:get "/lists" service {:name "banana"} (comp first :lists)])
 

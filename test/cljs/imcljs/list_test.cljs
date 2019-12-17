@@ -2,19 +2,17 @@
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [cljs.test :refer-macros [async deftest testing is use-fixtures]]
             [cljs.core.async :refer [<!]]
+            [imcljs.env :refer [service]]
             [imcljs.path :as path]
             [imcljs.fetch :as fetch]
             [imcljs.save :as save]
             [imcljs.internal.utils :refer [<<!]]))
 
-(def service {:root "https://www.flymine.org/flymine"
-              :model {:name "genomic"}})
-
-(def flymine-query {:from "Gene"
-                    :select ["Gene.id"]
-                    :where [{:path "Gene.symbol"
-                             :op "ONE OF"
-                             :values ["eve thor zen"]}]})
+(def query {:from "Gene"
+            :select ["Gene.id"]
+            :where [{:path "Gene.symbol"
+                     :op "ONE OF"
+                     :values ["eve thor zen"]}]})
 
 (deftest copy-list
   (testing "Should be able to copy a list"
@@ -23,7 +21,7 @@
         ; Add a token to our service
         (let [service (assoc service :token (<! (fetch/session service)))]
           (let [; Create a new list
-                new-list-name  (:listName (<! (save/im-list-from-query service "Some List" flymine-query)))
+                new-list-name  (:listName (<! (save/im-list-from-query service "Some List" query)))
                 ; Add a " - Duplicate" string to the end of the original list name
                 duplicate-name (str new-list-name " - Duplicate")
                 ; Copy the list and return its name
@@ -41,7 +39,7 @@
         ; Add a token to our service
         (let [service (assoc service :token (<! (fetch/session service)))]
           (let [; Create a new list
-                new-list-name (:listName (<! (save/im-list-from-query service "Some List" flymine-query)))
+                new-list-name (:listName (<! (save/im-list-from-query service "Some List" query)))
                 ; Add a " - Renamed" string to the end of the original list name
                 new-name      (str new-list-name " - Renamed")
                 ; Copy the list and return its name
