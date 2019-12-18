@@ -1,12 +1,12 @@
 language: java
-sudo: true
 jdk: openjdk8
-services: postgresql
 
 before_script:
   # Setup biotestmine to test against
-  - git clone https://github.com/intermine/ci-scripts
-  - (cd ci-scripts && bash init-biotestmine.sh)
+  - git clone https://github.com/intermine/docker-intermine-gradle
+  - (cd docker-intermine-gradle && docker-compose -f dockerhub.docker-compose.yml up -d)
+  # Wait until biotestmine has started
+  - until $(curl --output /dev/null --silent --head --fail http://localhost:9999/biotestmine); do sleep 20; done
   # Install lein - required to build the project
   - wget https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein -O /tmp/lein
   - chmod +x /tmp/lein
