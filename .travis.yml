@@ -7,6 +7,8 @@ before_script:
   - (cd docker-intermine-gradle && docker-compose -f dockerhub.docker-compose.yml up -d)
   # Wait until biotestmine has started
   - until $(curl --output /dev/null --silent --head --fail http://localhost:9999/biotestmine); do sleep 20; done
+  # Wait for biotestmine to restart
+  - sleep 300
   # Install lein - required to build the project
   - wget https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein -O /tmp/lein
   - chmod +x /tmp/lein
