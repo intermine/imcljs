@@ -218,3 +218,10 @@
            {:root "https://registry.intermine.org/service"}
            (when dev-mines? {:query-params {:mines "all"}})
            :instances))
+
+; Preferences
+
+(defn preferences
+  "Returns a map of preferences set for the authenticated user."
+  [service & [options]]
+  (restful :get "/user/preferences" service options :preferences))

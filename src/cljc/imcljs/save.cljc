@@ -70,3 +70,8 @@
   (go (let [old-list-details (<! (fetch/one-list service old-name))]
         ; Create a query from the old list and use it to save the new list
         (<! (im-list-from-query service new-name (copy-list-query old-list-details))))))
+
+(defn preferences
+  "Set the preferences for the authenticated user by passing a map."
+  [service preferences & [options]]
+  (restful :post "/user/preferences" service (merge preferences options) :preferences))
