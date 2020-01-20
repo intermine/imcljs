@@ -45,3 +45,14 @@
   [service username password & [options]]
   (let [params {:name username :password password}]
     (restful :post "/users" service (merge params options) :user)))
+
+(defn deregistration
+  "Creates a deregistration token which is to be passed to `delete-account`."
+  [service & [options]]
+  (restful :post "/user/deregistration" service options :token))
+
+(defn delete-account
+  "Takes a `deregistration` token to delete the authenticated user."
+  [service deregistration-token & [options]]
+  (let [params {:deregistrationToken deregistration-token}]
+    (restful :delete "/user" service (merge params options))))

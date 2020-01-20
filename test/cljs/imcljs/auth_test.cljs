@@ -79,3 +79,17 @@
           (is (or (= 400 (:status response)) ; Already registered.
                   (not-empty (:username response))))
           (done))))))
+
+(deftest deregistration-and-delete-account
+  (testing "Create a deregistration token and delete the account."
+    (async done
+      (go
+        (let [login-response (<! (auth/login service "auto_test@intermine.org" "secret"))
+              token (get-in login-response [:output :token])
+              service+auth (assoc service :token token)
+              deregistration-token (:uuid (<! (auth/deregistration service+auth)))
+              _delete-account (<! (auth/delete-account service+auth deregistration-token))
+              login-response-2 (<! (auth/login service "auto_test@intermine.org" "secret"))]
+          (is (= 200 (:statusCode login-response)))
+          (is (= 401 (:status login-response-2)))
+          (done))))))
