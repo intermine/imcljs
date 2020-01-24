@@ -72,6 +72,14 @@
         (<! (im-list-from-query service new-name (copy-list-query old-list-details))))))
 
 (defn preferences
-  "Set the preferences for the authenticated user by passing a map."
+  "Set the preferences for the authenticated user by passing a map.
+  Note that none of the values can be an empty string. For that you'll have to
+  use `delete-preference` instead."
   [service preferences & [options]]
   (restful :post "/user/preferences" service (merge preferences options) :preferences))
+
+(defn delete-preference
+  "Delete a single stored preference by key for the authenticated user."
+  [service preference & [options]]
+  (let [params (merge {:key preference} options)]
+    (restful :delete "/user/preferences" service params :preferences)))
