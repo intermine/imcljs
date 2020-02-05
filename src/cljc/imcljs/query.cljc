@@ -130,7 +130,8 @@
         head-attributes (cond-> {:model (:name model)
                                  :view (clojure.string/join " " (:select query))}
                           (:constraintLogic query) (assoc :constraintLogic (:constraintLogic query))
-                          (:sortOrder query) (assoc :sortOrder (clojure.string/join " " (flatten (map (juxt :path :direction) (:sortOrder query))))))]
+                          (:sortOrder query) (assoc :sortOrder (clojure.string/join " " (flatten (map (juxt :path :direction) (:sortOrder query)))))
+                          (:title query) (assoc :name (:title query)))]
     (str "<query " (stringiy-map head-attributes) ">"
          (when (:joins query) (apply str (map make-join (:joins query))))
 

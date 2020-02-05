@@ -68,6 +68,12 @@
           :else                        (>! return-chan false))))
     return-chan))
 
+(defn saved-queries
+  "Fetches queries saved under the user. Use the `:filter` option to only
+  return queries with the specified title, with optional `*` wildcards."
+  [service & [options]]
+  (restful :get "/user/queries" service options :queries))
+
 ; Assets
 
 (defn lists

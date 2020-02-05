@@ -83,3 +83,17 @@
   [service preference & [options]]
   (let [params (merge {:key preference} options)]
     (restful :delete "/user/preferences" service params :preferences)))
+
+(defn query
+  "Upload a query to be saved into the user's profile.
+  As of InterMine 4.1.2, the webservice returns an invalid JSON response, hence
+  why we use `:format 'text'` and no xform."
+  [service query & [options]]
+  (let [params (merge {:query query :format "text"} options)]
+    (restful :post "/user/queries" service params)))
+
+(defn delete-query
+  "Delete a query that has previously been saved into the user's profile."
+  [service title & [options]]
+  (let [params (merge {:name title} options)]
+    (restful :delete "/user/queries" service params)))
