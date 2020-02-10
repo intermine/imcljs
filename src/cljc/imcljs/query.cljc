@@ -1,7 +1,7 @@
 (ns imcljs.query
   (:require [imcljs.path :as path]
             [clojure.string :refer [join blank?]]
-            [clojure.set :refer [difference]]
+            [clojure.set :refer [difference rename-keys]]
             [imcljs.internal.utils :refer [alphabet]]))
 
 (defn value [x] (str "<value>" x "</value>"))
@@ -97,10 +97,19 @@
                             (conj total (assoc constraint :code next-available-code))))) [] constraints)))
     query))
 
+(defn enforce-sort-order
+  "Makes sure the query XML will have a sortOrder attribute instead of orderBy.
+  Only the former is supported as part of the PathQuery API."
+  [query]
+  (if (and (empty? (:sortOrder query))
+           (contains? query :orderBy))
+    (rename-keys query {:orderBy :sortOrder})
+    query))
+
 (defn enforce-sorting [query]
   (if (contains? query :sortOrder)
     (update query :sortOrder
-            (partial map
+            (partial mapv
                      (fn [order]
                        (let [order (if (nil? (:path order))
                                      {:path (str (name (first (first (seq order)))))
@@ -109,10 +118,12 @@
                          (if (= (:from query) (first (clojure.string/split (:path order) #"\.")))
                            order
                            (assoc order :path (str (:from query) "." (:path order))))))))
+
     query))
 
 (def sterilize-query (comp
                       enforce-sorting
+                      enforce-sort-order
                       enforce-constraints-have-class
                       enforce-constraints-have-code
                       enforce-joins-have-class
