@@ -64,9 +64,9 @@
         (let [login-response      (<! (auth/login service "test_user@mail_account" "secret"))
               token               (get-in login-response [:output :token])
               service+auth        (assoc service :token token)
-              change-password-res (<! (auth/change-password service+auth "overt"))
+              change-password-res (<! (auth/change-password service+auth "secret" "overt"))
               login-response-2    (<! (auth/login service "test_user@mail_account" "overt"))
-              _                   (<! (auth/change-password service+auth "secret"))]
+              _                   (<! (auth/change-password service+auth "overt" "secret"))]
           (is (= 200 (:statusCode change-password-res)))
           (is (= 200 (:statusCode login-response-2)))
           (done))))))

@@ -37,8 +37,9 @@
 
 (defn change-password
   "Changes the password of an authenticated user."
-  [service new-password]
-  (restful :post "/user" service {:newPassword new-password}))
+  [service old-password new-password]
+  (restful :post "/user" service {:oldPassword old-password
+                                  :newPassword new-password}))
 
 (defn register
   "Register a new user account."
