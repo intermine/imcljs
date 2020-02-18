@@ -74,7 +74,7 @@
       {:name `Organism`, :collections {...} :attributes {...}
       {:name `shortName`, :type `java.lang.String`}]"
   ([model path]
-   (let [p (if (string? path) (split-path path) path)]
+   (let [p (if (string? path) (split-path path) (map keyword path))]
      (if (= 1 (count p))
        [(get-in model [:classes (first p)])]
        (walk model p []))))

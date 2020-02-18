@@ -3,7 +3,7 @@
   (:require [cljs.test :refer-macros [async deftest testing is use-fixtures]]
             [cljs.core.async :refer [<!]]
             [imcljs.env :refer [service]]
-            [imcljs.path :as path]
+            [imcljs.auth :as auth]
             [imcljs.fetch :as fetch]
             [imcljs.save :as save]
             [imcljs.internal.utils :refer [<<!]]))
@@ -12,7 +12,14 @@
             :select ["Gene.id"]
             :where [{:path "Gene.symbol"
                      :op "ONE OF"
-                     :values ["eve thor zen"]}]})
+                     :values ["VAR" "ABRA" "PCNA" "STEVOR"]}]})
+
+(comment
+  "Evaluate this in REPL-connected editor to test query."
+  (go
+    (let [service (assoc service :token (<! (fetch/session service)))]
+      (.log js/console (<! (save/im-list-from-query service "Some List" query)))
+      (<! (save/im-list-delete service "Some List")))))
 
 (deftest copy-list
   (testing "Should be able to copy a list"
@@ -70,14 +77,14 @@
       (go
         (let [service (assoc service :token (<! (fetch/session service)))]
           (let [delete-status (->>
-                               (save/im-list service (gensym) "Gene" "eve thor zen")
+                               (save/im-list service (gensym) "Gene" "ABRA ENO")
                                <!
                                :listName
                                (save/im-list-delete service)
                                <!
                                :wasSuccessful)]
-            (is (true? delete-status)))
-          (done))))))
+            (is (true? delete-status))
+            (done)))))))
 
 (deftest delete-lists
   (testing "Should be able to delete multiple lists"
@@ -87,7 +94,7 @@
           (let [delete-status-col (->>
                                    (repeatedly gensym)
                                    (take 3)
-                                   (map (fn [name] (save/im-list service name "Gene" "eve thor zen")))
+                                   (map (fn [name] (save/im-list service name "Gene" "ABRA ENO")))
                                    <<!
                                    <!
                                    (map :listName)
@@ -96,9 +103,41 @@
                                    (map :wasSuccessful))]
             (is (and
                  (some? (not-empty delete-status-col))
-                 (every? true? delete-status-col))))
+                 (every? true? delete-status-col)))
+            (done)))))))
+
+(deftest list-tag
+  (testing "Should be able to add and remove tag for a list"
+    (async done
+      (go
+        (let [login-response  (<! (auth/login service "test_user@mail_account" "secret"))
+              token           (get-in login-response [:output :token])
+              service+auth    (assoc service :token token)
+              _create-list    (<! (save/im-list service+auth "mylist" "Gene" "ABRA ENO"))
+              _add-tag        (<! (save/im-list-add-tag service+auth "mylist" "mytag"))
+              list-response   (<! (fetch/one-list service+auth "mylist"))
+              _remove-tag     (<! (save/im-list-remove-tag service+auth "mylist" "mytag"))
+              list-response-2 (<! (fetch/one-list service+auth "mylist"))
+              _delete-list    (<! (save/im-list-delete service+auth "mylist"))]
+          (is (= ["mytag"] (:tags list-response)))
+          (is (empty? (:tags list-response-2)))
           (done))))))
 
-
-
-
+(deftest list-update
+  (testing "Should be able to add and remove description for a list"
+    (async done
+      (go
+        (let [login-response      (<! (auth/login service "test_user@mail_account" "secret"))
+              token               (get-in login-response [:output :token])
+              service+auth        (assoc service :token token)
+              _create-list        (<! (save/im-list service+auth "mylist" "Gene" "ABRA ENO"))
+              _add-description    (<! (save/im-list-update service+auth "mylist"
+                                                           {:newDescription "My description."}))
+              list-response       (<! (fetch/one-list service+auth "mylist"))
+              _remove-description (<! (save/im-list-update service+auth "mylist"
+                                                           {:newDescription ""}))
+              list-response-2     (<! (fetch/one-list service+auth "mylist"))
+              _delete-list        (<! (save/im-list-delete service+auth "mylist"))]
+          (is (= "My description." (:description list-response)))
+          (is (= "" (:description list-response-2)))
+          (done))))))
