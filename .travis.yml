@@ -1,12 +1,19 @@
 language: java
-sudo: true
 jdk: openjdk8
-services: postgresql
+addons:
+  apt:
+    packages:
+      - python3-pip
+      - python3-setuptools
+      - python3-wheel
 
 before_script:
+  # Use a newer version of Python
+  - pyenv versions
+  - pyenv global 3.6
   # Setup biotestmine to test against
-  - git clone https://github.com/intermine/ci-scripts
-  - (cd ci-scripts && bash init-biotestmine.sh)
+  - pip3 install intermine-boot
+  - intermine_boot start local --build-im --im-branch bluegenes
   # Install lein - required to build the project
   - wget https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein -O /tmp/lein
   - chmod +x /tmp/lein
