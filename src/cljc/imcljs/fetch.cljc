@@ -68,6 +68,12 @@
           :else                        (>! return-chan false))))
     return-chan))
 
+(defn saved-queries
+  "Fetches queries saved under the user. Use the `:filter` option to only
+  return queries with the specified title, with optional `*` wildcards."
+  [service & [options]]
+  (restful :get "/user/queries" service options :queries))
+
 ; Assets
 
 (defn lists
@@ -218,3 +224,10 @@
            {:root "https://registry.intermine.org/service"}
            (when dev-mines? {:query-params {:mines "all"}})
            :instances))
+
+; Preferences
+
+(defn preferences
+  "Returns a map of preferences set for the authenticated user."
+  [service & [options]]
+  (restful :get "/user/preferences" service options :preferences))

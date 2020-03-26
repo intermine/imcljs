@@ -12,6 +12,12 @@
   [service name type identifiers & [options]]
   (restful :post-body (str "/lists?name=" name "&type=" type) service {:body identifiers :headers {"Content-Type" "text/plain"}}))
 
+(defn im-list-update
+  "Update an existing list. Currently, only updating the description by specifying
+  `:newDescription` in the `options` map is supported."
+  [service name & [options]]
+  (restful :put "/lists" service (merge {:name name :format "json"} options)))
+
 (defn im-list-delete
   "Delete one or name lists."
   [service names & [options]]
@@ -50,6 +56,13 @@
                                               :format "json"}
                                              options)))
 
+(defn im-list-remove-tag
+  [service name tags & [options]]
+  (restful :delete "/list/tags" service (merge {:name name
+                                                :tags (if (coll? tags) (interpose ";" tags) tags)
+                                                :format "json"}
+                                               options)))
+
 (defn im-list-copy
   "Copy a list by name"
   [service old-name new-name & [options]]
@@ -57,3 +70,30 @@
   (go (let [old-list-details (<! (fetch/one-list service old-name))]
         ; Create a query from the old list and use it to save the new list
         (<! (im-list-from-query service new-name (copy-list-query old-list-details))))))
+
+(defn preferences
+  "Set the preferences for the authenticated user by passing a map.
+  Note that none of the values can be an empty string. For that you'll have to
+  use `delete-preference` instead."
+  [service preferences & [options]]
+  (restful :post "/user/preferences" service (merge preferences options) :preferences))
+
+(defn delete-preference
+  "Delete a single stored preference by key for the authenticated user."
+  [service preference & [options]]
+  (let [params (merge {:key preference} options)]
+    (restful :delete "/user/preferences" service params :preferences)))
+
+(defn query
+  "Upload a query to be saved into the user's profile.
+  As of InterMine 4.1.2, the webservice returns an invalid JSON response, hence
+  why we use `:format 'text'` and no xform."
+  [service query & [options]]
+  (let [params (merge {:query query :format "text"} options)]
+    (restful :post "/user/queries" service params)))
+
+(defn delete-query
+  "Delete a query that has previously been saved into the user's profile."
+  [service title & [options]]
+  (let [params (merge {:name title} options)]
+    (restful :delete "/user/queries" service params)))
