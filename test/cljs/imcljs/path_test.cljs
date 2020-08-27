@@ -24,6 +24,17 @@
             (is (= (map :name walked) '("Gene" "Protein" "Gene" "OntologyAnnotation" "OntologyTerm" "name")))
             (done)))))))
 
+(deftest walk-subclasses-with-type-constraints
+  (testing "Should be able to walk a path with multiple subclasses requiring type constraints and return parts of the model"
+    (async done
+      (go
+        (let [model (assoc (<! (fetch/model service))
+                           :type-constraints [{:path "Gene.childFeatures" :type "CDS"}
+                                              {:path "Gene.childFeatures.interactions.participant2" :type "Gene"}])]
+          (let [walked (path/walk model "Gene.childFeatures.interactions.participant2.proteinAtlasExpression.level")]
+            (is (= (map :name walked) '("Gene" "CDS" "Interaction" "Gene" "ProteinAtlasExpression" "level")))
+            (done)))))))
+
 (deftest walk-root
   (testing "Should be able to walk a path that is a single root and return parts of the model"
     (async done
