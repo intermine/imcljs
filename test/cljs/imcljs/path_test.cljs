@@ -29,10 +29,10 @@
     (async done
       (go
         (let [model (assoc (<! (fetch/model service))
-                           :type-constraints [{:path "Gene.childFeatures" :type "CDS"}
-                                              {:path "Gene.childFeatures.interactions.participant2" :type "Gene"}])]
-          (let [walked (path/walk model "Gene.childFeatures.interactions.participant2.proteinAtlasExpression.level")]
-            (is (= (map :name walked) '("Gene" "CDS" "Interaction" "Gene" "ProteinAtlasExpression" "level")))
+                           :type-constraints [{:path "Gene.childFeatures" :type "MRNA"}
+                                              {:path "Gene.childFeatures.CDSs.transcript" :type "TRNA"}])]
+          (let [walked (path/walk model "Gene.childFeatures.CDSs.transcript.name")]
+            (is (= (map :name walked) '("Gene" "MRNA" "CDS" "TRNA" "name")))
             (done)))))))
 
 (deftest walk-root
