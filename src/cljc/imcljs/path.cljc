@@ -68,20 +68,44 @@
 
 (defn- walk-rec
   [model [class-kw & [path & remaining]] trail curr-path path->subclass]
-  (let [class-kw (get path->subclass curr-path class-kw)
-        cv (class-value model class-kw path)
-        reference (:referencedType cv)]
+  ;; Notice that this recursive function consumes two elements of the path at a
+  ;; time. The reason for this is that if `path` happens to be an attribute, we
+  ;; need to know its class `class-kw` to be able to find it.
+  (let [;; At any point, a subclass constraint can override the default class.
+        class-kw (get path->subclass curr-path class-kw)
+        class (get-in model [:classes class-kw])
+        _ (assert (map? class) "Path traverses nonexistent class")
+        ;; Search the class for the property `path` to find the next referenced class.
+        {reference :referencedType :as class-value}
+        (get (apply merge (map class [:attributes :references :collections])) path)
+        ;; This is `curr-path` for the next recursion.
+        next-path (conj curr-path path)]
     (if remaining
+      ;; If we don't have a reference, we can't go on and so return nil.
       (when reference
         (recur model
+               ;; We cons the reference so we know the parent class in case the
+               ;; next recursion's `path` happens to be an attribute. In effect
+               ;; we only consume one element of the path at a time.
                (cons (keyword reference) remaining)
-               (conj trail (get-in model [:classes class-kw]))
-               (conj curr-path path)
+               (conj trail class)
+               next-path
                path->subclass))
-      (conj trail (get-in model [:classes class-kw])
-            (if reference
-              (get-in model [:classes (keyword reference)])
-              cv)))))
+      ;; Because we consume two elements of the path at a time, we have to
+      ;; repeat some logic in the termination case (hence we add two elements).
+      (conj trail
+            class
+            ;; The path can end with a subclass, so we check with `next-path`.
+            (if-let [subclass (get path->subclass next-path)]
+              ;; All the extra stuff done above to `class-kw` need not be
+              ;; repeated, as we've now consumed the entire path.
+              (get-in model [:classes subclass])
+              (if reference
+                ;; Usually the next recursion would get the class from reference.
+                (get-in model [:classes (keyword reference)])
+                ;; If there's no reference, this means the last element of the
+                ;; path is an attribute.
+                class-value))))))
 
 (defn walk
   "Return a vector representing each part of path.
