@@ -89,8 +89,11 @@
   (if (contains? query :where)
     (update query :where
             (fn [constraints]
-              (reduce (fn [total {:keys [code] :as constraint}]
-                        (if (some? code)
+              (reduce (fn [total {:keys [code type] :as constraint}]
+                        (if (or (some? code)
+                                ;; Type (aka subclass) constraints may not
+                                ;; participate in the constraint logic.
+                                (some? type))
                           (conj total constraint)
                           (let [existing-codes      (set (remove nil? (concat (map :code constraints) (map :code total))))
                                 next-available-code (first (filter (complement blank?) (difference alphabet existing-codes)))]
@@ -153,7 +156,9 @@
   "Deconstructs a query by its views and groups them by class.
   (deconstruct-by-class model query)
   {:Gene {Gene.homologues.homologue {:from Gene :select [Gene.homologues.homologue.id] :where [...]}
-         {Gene {:from Gene :select [Gene.id] :where [...]}}}"
+         {Gene {:from Gene :select [Gene.id] :where [...]}}}
+  Make sure to add :type-constraints to the model if the path traverses a subclass
+  (see docstring of `imcljs.path/walk` for more information)."
   [model query]
   (let [query (sterilize-query query)]
     (reduce (fn [path-map next-path]
@@ -164,7 +169,9 @@
 
 (defn group-views-by-class
   "Group the views of a query by their Class and provide a query
-  to retrieve just that column of data"
+  to retrieve just that column of data.
+  Make sure to add :type-constraints to the model if the path traverses a subclass
+  (see docstring of `imcljs.path/walk` for more information)."
   [model query]
   (let [query (sterilize-query query)]
     (reduce (fn [path-map next-path]

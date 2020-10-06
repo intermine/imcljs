@@ -1,3 +1,9 @@
+## 1.2.0 (2020-10-06)
+
+- Support subclasses by passing type-constraints with model [#51](https://github.com/intermine/imcljs/pull/51)
+    - Enables `imcljs.path/walk` to traverse subclasses specified via type constraints, and enables other functions dependent on it to handle subclasses correctly
+- Do not add constraint code to type constraints when sterilizing query [#51](https://github.com/intermine/imcljs/pull/51)
+
 ## 1.1.0 (2020-02-20)
 
 - Support new web services [#42](https://github.com/intermine/imcljs/pull/42)
