@@ -84,6 +84,12 @@
   [service name & [options]]
   (restful :get "/lists" service (merge {:name name} options) (comp first :lists)))
 
+(defn lists-containing
+  "Find lists on the server containing an object.
+  As a minimum, specify either :id or both of :publicId and :type."
+  [service & [options]]
+  (restful :get "/listswithobject" service options :lists))
+
 (defn model
   [service & [options]]
   (restful :get "/model" service options :model))
