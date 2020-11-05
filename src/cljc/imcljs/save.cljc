@@ -97,3 +97,24 @@
   [service title & [options]]
   (let [params (merge {:name title} options)]
     (restful :delete "/user/queries" service params)))
+
+(defn bluegenes-properties
+  "Add a new key to the BlueGenes-specific config for a mine.
+  Requires that you are authenticated as an admin."
+  [service key value & [options]]
+  (let [params (merge {:key key :value value} options)]
+    (restful :post "/bluegenes-properties" service params)))
+
+(defn update-bluegenes-properties
+  "Update an existing key in the BlueGenes-specific config for a mine.
+  Requires that you are authenticated as an admin."
+  [service key value & [options]]
+  (let [params (merge {:key key :value value} options)]
+    (restful :put "/bluegenes-properties" service params)))
+
+(defn delete-bluegenes-properties
+  "Delete an existing key in the BlueGenes-specific config for a mine.
+  Requires that you are authenticated as an admin."
+  [service key & [options]]
+  (let [params (merge {:key key} options)]
+    (restful :delete "/bluegenes-properties" service params)))

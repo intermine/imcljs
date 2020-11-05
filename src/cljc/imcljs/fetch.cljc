@@ -164,6 +164,12 @@
   [service]
   (restful :get "/branding" service {} :properties))
 
+(defn bluegenes-properties
+  "Returns the BlueGenes-specific configs for a given mine. These are created
+  and maintained by BlueGenes, similarly to a key-value store."
+  [service & [options]]
+  (restful :get "/bluegenes-properties" service options :bluegenes-properties))
+
 
 ; ID Resolution
 
