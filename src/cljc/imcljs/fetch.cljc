@@ -158,6 +158,12 @@
   [service]
   (restful :get "/web-properties" service {} :web-properties))
 
+(defn branding
+  "Returns the branding details for a given mine.
+  Used to make things more personal!"
+  [service]
+  (restful :get "/branding" service {} :properties))
+
 
 ; ID Resolution
 
