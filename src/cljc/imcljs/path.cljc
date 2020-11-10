@@ -7,7 +7,7 @@
   "Split a string path into a vector of keywords.
   (split-path `Gene.organism.shortName`)
   => [:Gene :organism :shortName]"
-  [path-str] (map keyword (split path-str #"\.")))
+  [path-str] (mapv keyword (split path-str #"\.")))
 
 (defn join-path
   "Join a vector path of keywords to a string.
@@ -66,46 +66,41 @@
        (filter identity)
        first))
 
-(defn- walk-rec
-  [model [class-kw & [path & remaining]] trail curr-path path->subclass]
-  ;; Notice that this recursive function consumes two elements of the path at a
-  ;; time. The reason for this is that if `path` happens to be an attribute, we
-  ;; need to know its class `class-kw` to be able to find it.
-  (let [;; At any point, a subclass constraint can override the default class.
-        class-kw (get path->subclass curr-path class-kw)
-        class (get-in model [:classes class-kw])
-        _ (assert (map? class) "Path traverses nonexistent class")
-        ;; Search the class for the property `path` to find the next referenced class.
-        {reference :referencedType :as class-value}
-        (get (apply merge (map class [:attributes :references :collections])) path)
-        ;; This is `curr-path` for the next recursion.
-        next-path (conj curr-path path)]
-    (if remaining
-      ;; If we don't have a reference, we can't go on and so return nil.
-      (when reference
-        (recur model
-               ;; We cons the reference so we know the parent class in case the
-               ;; next recursion's `path` happens to be an attribute. In effect
-               ;; we only consume one element of the path at a time.
-               (cons (keyword reference) remaining)
-               (conj trail class)
-               next-path
-               path->subclass))
-      ;; Because we consume two elements of the path at a time, we have to
-      ;; repeat some logic in the termination case (hence we add two elements).
-      (conj trail
-            class
-            ;; The path can end with a subclass, so we check with `next-path`.
-            (if-let [subclass (get path->subclass next-path)]
-              ;; All the extra stuff done above to `class-kw` need not be
-              ;; repeated, as we've now consumed the entire path.
-              (get-in model [:classes subclass])
-              (if reference
-                ;; Usually the next recursion would get the class from reference.
-                (get-in model [:classes (keyword reference)])
-                ;; If there's no reference, this means the last element of the
-                ;; path is an attribute.
-                class-value))))))
+(defn- walk-get-property
+  "Returns the `prop` property of a model `class`. Lenient to nil arguments."
+  [class prop]
+  (when (map? class)
+    (some->> prop
+             (get (apply merge
+                         (map class [:attributes :references :collections]))))))
+
+(defn- walk-current-path
+  "Returns the portion of `path` that has been consumed by `rem-path`."
+  [path rem-path]
+  (subvec path 0 (- (count path)
+                    (count rem-path))))
+
+(defn- walk-loop
+  [model path & {:keys [path->subclass walk-properties?]}]
+  (let [root-class (get-in model [:classes (first path)])]
+    (loop [rem-path (-> path next next) ; First iteration consumes two.
+           property (walk-get-property root-class (second path))
+           walked [root-class]]
+      (let [next-class (when-let [reference (keyword (:referencedType property))]
+                         ;; Use the subclass if defined for next-class.
+                         (let [curr-path (walk-current-path path rem-path)
+                               reference (get path->subclass curr-path reference)]
+                           (get-in model [:classes reference])))
+            walked (conj walked (if walk-properties?
+                                  property ; Always use property if specified.
+                                  (or next-class ; Otherwise use class.
+                                      property)))] ; If the path ends at an attribute.
+        (cond
+          (empty? rem-path) walked
+          (empty? property) nil ; Path is unresolvable.
+          :else (recur (next rem-path)
+                       (walk-get-property next-class (first rem-path))
+                       walked))))))
 
 (defn walk
   "Return a vector representing each part of path.
@@ -119,17 +114,22 @@
       [{:path `Gene.interactions.participant2`, :type `Gene`}]
   for the path to be resolvable.
       (walk im-model-with-type-constraints
-       `Gene.interactions.participant2.proteinAtlasExpression.tissue.name`)"
-  [model path]
-  (let [p (if (string? path) (split-path path) (map keyword path))]
+       `Gene.interactions.participant2.proteinAtlasExpression.tissue.name`)
+  Optional keyword arguments:
+  walk-properties? - If true, each element will be the parent's property,
+  instead of the referencedType.  The first element will still be a class as it
+  has no parent."
+  [model path & {:keys [walk-properties?]}]
+  (let [p (if (string? path) (split-path path) (mapv keyword path))]
     (if (= 1 (count p))
       [(get-in model [:classes (first p)])]
-      (walk-rec model p [] [(first p)]
-                (->> (:type-constraints model)
-                     (filter #(contains? % :type)) ; In case there are other constraints there.
-                     (reduce (fn [m {:keys [path type]}]
-                               (assoc m (split-path path) (keyword type)))
-                             {}))))))
+      (walk-loop model p
+        :path->subclass (->> (:type-constraints model)
+                             (filter #(contains? % :type)) ; In case there are other constraints there.
+                             (reduce (fn [m {:keys [path type]}]
+                                       (assoc m (split-path path) (keyword type)))
+                                     {}))
+        :walk-properties? walk-properties?))))
 
 (defn data-type
   "Return the java type of a path representing an attribute.
@@ -169,19 +169,13 @@
 
 (defn display-name
   "Returns a vector of friendly names representing the path.
-  ; TODO make this work with subclasses"
-  ([model path]
-   (let [p (if (string? path) (split-path path) path)]
-     (display-name model p [(get-in model [:classes (first p) :displayName])])))
-  ([model [head next & tail] collected]
-   (if next
-     (let [props      (-> model (get-in [:classes head]) (select-keys [:attributes :references :collections]) vals mapify)
-           collected+ (conj collected
-                            (or (get-in props [next :displayName])
-                                (un-camel-case (get-in props [next :name]))))]
-       (if (not-empty tail)
-         (recur model (conj tail (keyword (get-in props [next :referencedType]))) collected+)
-         collected+)))))
+  Make sure to add :type-constraints to the model if the path traverses a subclass
+  (see docstring of `walk` for more information)."
+  [model path]
+  (mapv (fn [prop]
+          (or (:displayName prop)
+              (un-camel-case (:name prop))))
+        (walk model path :walk-properties? true)))
 
 (defn attributes
   "Returns all attributes for a given string path.

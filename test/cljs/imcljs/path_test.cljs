@@ -6,8 +6,8 @@
             [imcljs.path :as path]
             [imcljs.fetch :as fetch]))
 
-(deftest walk-subclass
-  (testing "Should be able to walk a path that with"
+(deftest walk-parent-reference
+  (testing "Should be able to walk a path that references its parent and return parts of the model"
     (async done
       (go
         (let [model (<! (fetch/model service))]
@@ -15,8 +15,8 @@
             (is (= (map :name walked) '("Gene" "Protein" "Gene")))
             (done)))))))
 
-(deftest walk-subclasses
-  (testing "Should be able to walk a path with multiple subclasses and return parts of the model"
+(deftest walk-parent-references
+  (testing "Should be able to walk a path with multiple parent references and return parts of the model"
     (async done
       (go
         (let [model (<! (fetch/model service))]
@@ -50,6 +50,24 @@
         (let [model (<! (fetch/model service))]
           (let [walked (path/walk model "Gene")]
             (is (= (map :name walked) '("Gene")))
+            (done)))))))
+
+(deftest walk-properties
+  (testing "Should be able to walk a path and return properties of the classes in the model"
+    (async done
+      (go
+        (let [model (<! (fetch/model service))]
+          (let [walked (path/walk model "Gene.alleles" :walk-properties? true)]
+            (is (= (map :displayName walked) '("Gene" "Alleles")))
+            (done))))))
+  (testing "Should be able to walk a path with multiple subclasses requiring type constraints and return properties of the classes in the model"
+    (async done
+      (go
+        (let [model (assoc (<! (fetch/model service))
+                           :type-constraints [{:path "Gene.childFeatures" :type "MRNA"}
+                                              {:path "Gene.childFeatures.CDSs.transcript" :type "TRNA"}])]
+          (let [walked (path/walk model "Gene.childFeatures.CDSs.transcript.name" :walk-properties? true)]
+            (is (= (map :displayName walked) '("Gene" "Child Features" "CDSs" "Transcript" "Name")))
             (done)))))))
 
 (deftest path-root
