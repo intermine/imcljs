@@ -57,3 +57,22 @@
   [service deregistration-token & [options]]
   (let [params {:deregistrationToken deregistration-token}]
     (restful :delete "/user" service (merge params options))))
+
+(defn oauth2authenticator
+  "Commence authentication for logging in using OAuth 2.0 with specified
+  provider.  Will return a URL to redirect to the external login page.
+  Remember to append a `redirect_uri` parameter to the URL before redirecting.
+  This should be an endpoint which will be redirected to after signing in at
+  the third-party, passing parameters required for the `oauth2callback`.
+  Note that the redirect URL might be checked against a whitelist."
+  [service provider & [options]]
+  (let [params {:provider provider}]
+    (restful :get "/oauth2authenticator" service (merge params options) :link)))
+
+(defn oauth2callback
+  "Complete authentication for logging in using OAuth 2.0. Requires parameters
+  state and code, which are received when redirecting back from the external
+  login service in `oauth2authenticator`, in addition to provider which should
+  be identical to the one passed to `oauth2authenticator`."
+  [service & [options]]
+  (restful :get "/oauth2callback" service options))

@@ -100,12 +100,14 @@ Most result-fetching functions require that the `:model` key be present in their
 
 **Required dependency:** phantomjs, to run the tests in a headless javascript engine. You'll need a recent version of node installed, perhaps via [nvm](https://github.com/creationix/nvm). Once node is installed, run `npm install -g phantomjs` to install phantomjs. 
 
+**Local biotestmine:** The tests are run against a local biotestmine instance on port 9999 (can be changed in *test/cljs/imcljs/env.cljs*). If you're not familiar with building InterMine instances, we recommend using [intermine_boot](https://github.com/intermine/intermine_boot).
+
 **To run tests in the browser:**
 ```bash
 lein doo
 ```
 
-To run tests in the JVM:
+**To run tests in the JVM:**
 ```bash
 lein test
 ```

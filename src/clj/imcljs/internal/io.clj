@@ -5,7 +5,8 @@
             [imcljs.internal.defaults :refer [url wrap-request-defaults
                                               wrap-post-defaults
                                               wrap-put-defaults
-                                              wrap-auth]]
+                                              wrap-auth
+                                              wrap-get-defaults]]
             [imcljs.internal.utils :refer [assert-args]]))
 
 (def method-map {:get client/get
@@ -59,12 +60,12 @@
 (defn get-body-wrapper-
   [path {:keys [root token model]} options & [xform]]
   (parse-response xform (client/get (url root path)
-                                    (-> options ; Blank request map
+                                    (-> {} ; Blank request map
                                         ;(wrap-accept)
                                         (wrap-request-defaults xform) ; Add defaults such as with-credentials false?
+                                        (wrap-get-defaults options) ; Add query params
                                         ; If we have basic auth options then convert them from the cljs-http to clj-http format
-                                        wrap-basic-auth
-                                        ;(wrap-post-defaults options model) ; Add form params
+                                        (wrap-basic-auth)
                                         (wrap-auth token)
                                         (merge {:as :json})))))
 

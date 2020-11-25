@@ -84,6 +84,12 @@
   [service name & [options]]
   (restful :get "/lists" service (merge {:name name} options) (comp first :lists)))
 
+(defn lists-containing
+  "Find lists on the server containing an object.
+  As a minimum, specify either :id or both of :publicId and :type."
+  [service & [options]]
+  (restful :get "/listswithobject" service options :lists))
+
 (defn model
   [service & [options]]
   (restful :get "/model" service options :model))
@@ -151,6 +157,18 @@
    used to initialise most bluegenes page sections! "
   [service]
   (restful :get "/web-properties" service {} :web-properties))
+
+(defn branding
+  "Returns the branding details for a given mine.
+  Used to make things more personal!"
+  [service]
+  (restful :get "/branding" service {} :properties))
+
+(defn bluegenes-properties
+  "Returns the BlueGenes-specific configs for a given mine. These are created
+  and maintained by BlueGenes, similarly to a key-value store."
+  [service & [options]]
+  (restful :get "/bluegenes-properties" service options :bluegenes-properties))
 
 
 ; ID Resolution
