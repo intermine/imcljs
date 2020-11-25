@@ -124,12 +124,12 @@
     (if (= 1 (count p))
       [(get-in model [:classes (first p)])]
       (walk-loop model p
-        :path->subclass (->> (:type-constraints model)
-                             (filter #(contains? % :type)) ; In case there are other constraints there.
-                             (reduce (fn [m {:keys [path type]}]
-                                       (assoc m (split-path path) (keyword type)))
-                                     {}))
-        :walk-properties? walk-properties?))))
+                 :path->subclass (->> (:type-constraints model)
+                                      (filter #(contains? % :type)) ; In case there are other constraints there.
+                                      (reduce (fn [m {:keys [path type]}]
+                                                (assoc m (split-path path) (keyword type)))
+                                              {}))
+                 :walk-properties? walk-properties?))))
 
 (defn data-type
   "Return the java type of a path representing an attribute.
