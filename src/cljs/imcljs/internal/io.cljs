@@ -29,7 +29,13 @@
             (wrap-auth token)
             ; Stringify the clojure body to a JSON data structure
             ; This should still work when sending plain/text rather than application/json
-            (update :body (comp js/JSON.stringify clj->js)))))
+            (update :body (fn [body]
+                            (if (coll? body)
+                              (-> body clj->js js/JSON.stringify)
+                              ;; If the body is not a collection (usually a map), it is most likely a string.
+                              ;; We have to pass them as they are, or else the "" will get included in the body,
+                              ;; which makes it impossible to pass more than one identifier.
+                              body))))))
 
 (defn post-wrapper-
   "Returns the results of queries as table rows."
