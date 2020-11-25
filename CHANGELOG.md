@@ -1,3 +1,23 @@
+## 1.3.0 (2020-11-25)
+
+[#52](https://github.com/intermine/imcljs/pull/52)
+- Support more webservices
+    - `fetch/lists-containing` for getting lists that contain an object
+    - `fetch/branding` to get logo and colors of mine
+- Support new bluegenes-properties webservice
+    - `fetch/bluegenes-properties`
+    - `save/bluegenes-properties`
+    - `save/update-bluegenes-properties`
+    - `save/delete-bluegenes-properties`
+- Fix GET parameters not passed when used from JVM
+- Support OAuth2 via Intermine backend (see `auth/oauth2*`)
+- Fixes and improvements to `imcljs.path`
+    - Rewrite `path/walk` to support walking properties
+    - Fix `path/split-path` not returning vector as documented
+    - Make `path/display-name` work with subclasses
+    - More tests for `path/walk`
+- Fix `save/im-list` not able to pass more than one identifier
+
 ## 1.2.0 (2020-10-06)
 
 - Support subclasses by passing type-constraints with model [#51](https://github.com/intermine/imcljs/pull/51)
