@@ -1,3 +1,7 @@
+## 1.3.1 (2020-12-15)
+
+- Support permanent-url webservice to generate a URL to access an object even when its object ID has changed
+
 ## 1.3.0 (2020-11-25)
 
 [#52](https://github.com/intermine/imcljs/pull/52)
