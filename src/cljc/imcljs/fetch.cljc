@@ -249,3 +249,11 @@
   "Returns a map of preferences set for the authenticated user."
   [service & [options]]
   (restful :get "/user/preferences" service options :preferences))
+
+; Permanent URL
+
+(defn permanent-url
+  "Returns a permanent URL to access a data object even when its ID has changed."
+  [service id & [options]]
+  (let [params {:id id}]
+    (restful :get "/permanent-url" service (merge params options) :url)))
