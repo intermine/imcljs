@@ -58,6 +58,12 @@
   (let [params {:deregistrationToken deregistration-token}]
     (restful :delete "/user" service (merge params options))))
 
+(defn create-token
+  "Create a new token. See web service documentation for more info."
+  [service type & [options]]
+  (let [params {:type type}]
+    (restful :post "/user/tokens" service (merge params options) :token)))
+
 (defn oauth2authenticator
   "Commence authentication for logging in using OAuth 2.0 with specified
   provider.  Will return a URL to redirect to the external login page.
