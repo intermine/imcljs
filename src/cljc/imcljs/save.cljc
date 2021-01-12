@@ -3,6 +3,7 @@
   (:require [imcljs.internal.io :refer [restful]]
             [imcljs.fetch :as fetch :refer [lists]]
             [imcljs.internal.utils :refer [copy-list-query <<!]]
+            [clojure.string :refer [join]]
             #?(:cljs [cljs.core.async :as a :refer [<! >! chan]]
                :clj
                [clojure.core.async :as a :refer [<! >! go chan]])))
@@ -70,6 +71,13 @@
   (go (let [old-list-details (<! (fetch/one-list service old-name))]
         ; Create a query from the old list and use it to save the new list
         (<! (im-list-from-query service new-name (copy-list-query old-list-details))))))
+
+(defn im-list-upgrade
+  "Perform a list upgrade, replacing it with the specified up-to-date object IDs."
+  [service name object-ids]
+  (restful :post-body (str "/upgradelist?name=" name) service
+           {:body (join ", " object-ids)
+            :headers {"Content-Type" "text/plain"}}))
 
 (defn preferences
   "Set the preferences for the authenticated user by passing a map.
