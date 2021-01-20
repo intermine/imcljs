@@ -27,12 +27,6 @@ jobs:
         paths:
         - ~/.m2
     - run: npm install -g phantomjs
-    - run:
-        name: Wait until web server is ready
-        command: |
-          until $(curl --output /dev/null --silent --head --fail http://localhost:5000); do
-              sleep 10
-          done
     - run: lein doo phantom test once
   docs_build:
     executor: docs_exec
