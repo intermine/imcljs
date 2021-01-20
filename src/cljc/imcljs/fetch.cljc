@@ -174,29 +174,47 @@
 ; ID Resolution
 
 
+(defn- list-resolution-job?
+  "Internal function to return whether options is a list resolution job."
+  [options]
+  (and (:name options)
+       (not (:identifiers options))))
+
+(defn- id-resolution-endpoint
+  "Internal function to select the correct id resolution endpoint based on options."
+  [options]
+  (if (list-resolution-job? options)
+    "/listresolver"
+    "/ids"))
+
 (defn fetch-id-resolution-job-results
   "Fetches the results of an id resolution job"
-  [service uid]
-  (restful :get (str "/ids/" uid "/results") service {} :results))
+  [service uid & [options]]
+  (restful :get (str (id-resolution-endpoint options) "/" uid "/results") service {} :results))
 
 (defn fetch-id-resolution-job-status
   "Fetches the status of an id resolution job"
-  [service uid]
-  (restful :get (str "/ids/" uid "/status") service {}))
+  [service uid & [options]]
+  (restful :get (str (id-resolution-endpoint options) "/" uid "/status") service {}))
 
 (defn fetch-id-resolution-job
   "Starts an id resolution job"
-  [service {:keys [identifiers type case-sensitive wild-cards extra] :as options}]
-  (restful :post-body "/ids" service
-           {:body (cond-> {:identifiers identifiers}
-                    type (assoc :type type)
-                    case-sensitive (assoc :caseSensitive true)
-                    wild-cards (assoc :wildCards true)
-                    extra (assoc :extra extra))
-            :headers {"Content-Type" "application/json"}}))
+  [service {:keys [identifiers type case-sensitive wild-cards extra name] :as options}]
+  (restful (if (list-resolution-job? options) :post :post-body)
+           (id-resolution-endpoint options)
+           service
+           (if (list-resolution-job? options)
+             {:name name}
+             {:body (cond-> {:identifiers identifiers}
+                      type (assoc :type type)
+                      case-sensitive (assoc :caseSensitive true)
+                      wild-cards (assoc :wildCards true)
+                      extra (assoc :extra extra))
+              :headers {"Content-Type" "application/json"}})))
 
 (defn resolve-identifiers
-  "Resolves identifiers. Automatically handles polling"
+  "Resolves identifiers. Automatically handles polling.
+  Will use listresolver endpoint if name instead of identifiers is specified."
   [service {:keys [timeout-ms] :as options}]
   (let [return-chan (chan 1)]
     (go (let [{:keys [uid] :as job}
@@ -205,10 +223,10 @@
             (loop [ms 100
                    total-ms 0]
               (let [{:keys [status] :as res}
-                    (<! (fetch-id-resolution-job-status service uid))]
+                    (<! (fetch-id-resolution-job-status service uid options))]
                 (case status
                   "SUCCESS" (let [results
-                                  (<! (fetch-id-resolution-job-results service uid))]
+                                  (<! (fetch-id-resolution-job-results service uid options))]
                               (>! return-chan results))
                   "RUNNING" (do
                               (<! (timeout ms))

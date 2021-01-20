@@ -58,6 +58,12 @@
   (let [params {:deregistrationToken deregistration-token}]
     (restful :delete "/user" service (merge params options))))
 
+(defn create-token
+  "Create a new token. See web service documentation for more info."
+  [service type & [options]]
+  (let [params {:type type}]
+    (restful :post "/user/tokens" service (merge params options) :token)))
+
 (defn oauth2authenticator
   "Commence authentication for logging in using OAuth 2.0 with specified
   provider.  Will return a URL to redirect to the external login page.
@@ -76,3 +82,17 @@
   be identical to the one passed to `oauth2authenticator`."
   [service & [options]]
   (restful :get "/oauth2callback" service options))
+
+(defn request-password-reset
+  "Sends a password reset email to the user containing a specified redirectUrl
+  with a token appended as a query string."
+  [service email redirectUrl & [options]]
+  (let [params {:email email :redirectUrl redirectUrl}]
+    (restful :get "/user/requestpswreset" service (merge params options))))
+
+(defn password-reset
+  "Reset the user's password using the token received from
+  `request-password-reset` and newPassword."
+  [service newPassword pswResetToken & [options]]
+  (let [params {:newPassword newPassword :pswResetToken pswResetToken}]
+    (restful :put "/user/pswreset" service (merge params options))))
