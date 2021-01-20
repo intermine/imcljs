@@ -173,6 +173,7 @@
 
 ; ID Resolution
 
+
 (defn- list-resolution-job?
   "Internal function to return whether options is a list resolution job."
   [options]

@@ -1,0 +1,84 @@
+version: 2.1
+executors:
+  intermine_exec:
+    machine:
+      image: ubuntu-1604:201903-01
+  docs_exec:
+    docker:
+    - image: 'circleci/clojure:openjdk-8-lein-2.9.1-node-browsers'
+jobs:
+  setup_intermine:
+    executor: intermine_exec
+    steps:
+    - run: pyenv versions
+    - run: pyenv global 3.6.5
+    - run: pip3 install intermine-boot
+    - run: intermine_boot start local --build-im --im-branch bluegenes
+    - checkout
+    - restore_cache:
+        keys:
+        - v1-deps-{{ .Branch }}-{{ checksum "project.clj" }}
+        - v1-deps-{{ .Branch }}
+        - v1-deps
+    - run: lein deps
+    - run: lein cljfmt check
+    - save_cache:
+        key: v1-deps-{{ .Branch }}-{{ checksum "project.clj" }}
+        paths:
+        - ~/.m2
+    - run: npm install -g phantomjs
+    - run:
+        name: Wait until web server is ready
+        command: |
+          until $(curl --output /dev/null --silent --head --fail http://localhost:5000); do
+              sleep 10
+          done
+    - run: lein doo phantom test once
+  docs_build:
+    executor: docs_exec
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+          - v1-deps-codox-{{ .Branch }}-{{ checksum "project.clj" }}
+          - v1-deps-{{ .Branch }}
+          - v1-deps
+      - run: lein codox
+      - save_cache:
+          key: v1-deps-codox-{{ .Branch }}-{{ checksum "project.clj" }}
+          paths:
+          - ~/.m2
+      - persist_to_workspace:
+          root: target
+          paths: doc
+  docs_deploy:
+    docker:
+      - image: node:8.10.0
+    steps:
+      - checkout
+      - attach_workspace:
+          at: target
+      - run:
+          name: Install and configure dependencies
+          command: |
+            npm install -g --silent gh-pages@2.0.1
+            git config user.email "ci-build@intermine.org"
+            git config user.name "ci-build"
+      - add_ssh_keys:
+          fingerprints:
+            - "7b:ee:fa:0a:0a:10:56:55:7b:25:2f:45:d2:53:55:ce"
+      - run:
+          name: Deploy docs to gh-pages branch
+          command: gh-pages --message "[skip ci] Updates" --dist target/doc
+workflows:
+  build_and_test:
+    jobs:
+      - setup_intermine
+      - docs_build
+      - docs_deploy:
+          requires:
+            - setup_intermine
+            - docs_build
+          filters:
+            branches:
+              only: dev
