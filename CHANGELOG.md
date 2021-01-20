@@ -1,3 +1,11 @@
+## 1.3.2 (2021-01-20)
+
+[#53](https://github.com/intermine/imcljs/pull/53)
+- New password reset webservices `auth/request-password-reset` and `auth/password-reset`
+- Create token (specifically for type=api) with `auth/create-token`
+- Handle ID resolution job for `TO_UPGRADE` lists, when `fetch/resolve-identifiers` is passed list name instead of identifiers
+- Upgrade `TO_UPGRADE` list by passing list name and new object IDs to `save/im-list-upgrade`
+
 ## 1.3.1 (2020-12-15)
 
 - Support permanent-url webservice to generate a URL to access an object even when its object ID has changed
