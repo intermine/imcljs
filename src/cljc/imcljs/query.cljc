@@ -100,6 +100,20 @@
                             (conj total (assoc constraint :code next-available-code))))) [] constraints)))
     query))
 
+(defn enforce-constraints-loop-as-value [query]
+  (if (contains? query :where)
+    (update query :where
+            (partial mapv
+                     (fn [{:keys [loopPath value] :as constraint}]
+                       (if (and (some? loopPath) (nil? value))
+                         (-> constraint
+                             (assoc :value (if (= (:from query) (first (clojure.string/split loopPath #"\.")))
+                                             loopPath
+                                             (str (:from query) "." loopPath)))
+                             (dissoc :loopPath))
+                         constraint))))
+    query))
+
 (defn enforce-sort-order
   "Makes sure the query XML will have a sortOrder attribute instead of orderBy.
   Only the former is supported as part of the PathQuery API."
@@ -127,6 +141,7 @@
 (def sterilize-query (comp
                       enforce-sorting
                       enforce-sort-order
+                      enforce-constraints-loop-as-value
                       enforce-constraints-have-class
                       enforce-constraints-have-code
                       enforce-joins-have-class
