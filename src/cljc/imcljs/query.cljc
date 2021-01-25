@@ -1,6 +1,6 @@
 (ns imcljs.query
   (:require [imcljs.path :as path]
-            [clojure.string :refer [join blank?]]
+            [clojure.string :refer [join blank? escape]]
             [clojure.set :refer [difference rename-keys]]
             [imcljs.internal.utils :refer [alphabet]]))
 
@@ -45,9 +45,21 @@
            (str ">" (apply str (map value values)) "</" elem ">")
            "/>"))))
 
-(defn stringiy-map
+(let [cmap {\" "&quot;"
+            \< "&lt;"
+            \& "&amp;"}]
+  (defn escape-attribute
+    "Replace double quotation mark, less than and ampersand characters with
+    their HTML entity, as these are not permitted in XML attribute values."
+    [s]
+    (escape s cmap)))
+
+(defn stringify-map
   [m]
-  (reduce (fn [total [k v]] (str total (if total " ") (name k) "=" (str \" v \"))) nil m))
+  (reduce (fn [total [k v]]
+            (str total (when total " ") (name k) "=" (str \" (escape-attribute v) \")))
+          nil
+          m))
 
 (defn enforce-origin [query]
   (if (nil? (:from query))
@@ -176,7 +188,7 @@
                           (:constraintLogic query) (assoc :constraintLogic (:constraintLogic query))
                           (:sortOrder query) (assoc :sortOrder (clojure.string/join " " (flatten (map (juxt :path :direction) (:sortOrder query)))))
                           (:title query) (assoc :name (:title query)))]
-    (str "<query " (stringiy-map head-attributes) ">"
+    (str "<query " (stringify-map head-attributes) ">"
          (when (:joins query) (apply str (map make-join (:joins query))))
 
          (apply str (map (partial map->xmlstr "constraint") (:where query)))
