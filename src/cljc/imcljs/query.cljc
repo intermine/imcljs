@@ -114,6 +114,20 @@
                          constraint))))
     query))
 
+(defn enforce-constraints-valueless
+  "IS NULL and IS NOT NULL constraints shouldn't have a value."
+  [query]
+  (if (contains? query :where)
+    (update query :where
+            (partial mapv
+                     (fn [{:keys [op] :as constraint}]
+                       (if (contains? #{"IS NULL" "IS NOT NULL"} op)
+                         (cond-> constraint
+                           (contains? constraint :value) (dissoc :value)
+                           (contains? constraint :values) (dissoc :values))
+                         constraint))))
+    query))
+
 (defn enforce-sort-order
   "Makes sure the query XML will have a sortOrder attribute instead of orderBy.
   Only the former is supported as part of the PathQuery API."
@@ -141,6 +155,7 @@
 (def sterilize-query (comp
                       enforce-sorting
                       enforce-sort-order
+                      enforce-constraints-valueless
                       enforce-constraints-loop-as-value
                       enforce-constraints-have-class
                       enforce-constraints-have-code
