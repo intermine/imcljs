@@ -275,3 +275,11 @@
   [service id & [options]]
   (let [params {:id id}]
     (restful :get "/permanent-url" service (merge params options) :url)))
+
+; Semantic markup
+
+(defn semantic-markup
+  "Returns the JSON semantic markup for a page. See web service documentation
+  for supported pages and their required parameters."
+  [service page & [options]]
+  (restful :get (str "/semantic-markup/" page) service options :semantic-markups))
