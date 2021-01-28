@@ -1,6 +1,6 @@
 (ns imcljs.query
   (:require [imcljs.path :as path]
-            [clojure.string :refer [join blank?]]
+            [clojure.string :refer [join blank? escape]]
             [clojure.set :refer [difference rename-keys]]
             [imcljs.internal.utils :refer [alphabet]]))
 
@@ -45,9 +45,21 @@
            (str ">" (apply str (map value values)) "</" elem ">")
            "/>"))))
 
-(defn stringiy-map
+(let [cmap {\" "&quot;"
+            \< "&lt;"
+            \& "&amp;"}]
+  (defn escape-attribute
+    "Replace double quotation mark, less than and ampersand characters with
+    their HTML entity, as these are not permitted in XML attribute values."
+    [s]
+    (escape s cmap)))
+
+(defn stringify-map
   [m]
-  (reduce (fn [total [k v]] (str total (if total " ") (name k) "=" (str \" v \"))) nil m))
+  (reduce (fn [total [k v]]
+            (str total (when total " ") (name k) "=" (str \" (escape-attribute v) \")))
+          nil
+          m))
 
 (defn enforce-origin [query]
   (if (nil? (:from query))
@@ -100,6 +112,34 @@
                             (conj total (assoc constraint :code next-available-code))))) [] constraints)))
     query))
 
+(defn enforce-constraints-loop-as-value [query]
+  (if (contains? query :where)
+    (update query :where
+            (partial mapv
+                     (fn [{:keys [loopPath value] :as constraint}]
+                       (if (and (some? loopPath) (nil? value))
+                         (-> constraint
+                             (assoc :value (if (= (:from query) (first (clojure.string/split loopPath #"\.")))
+                                             loopPath
+                                             (str (:from query) "." loopPath)))
+                             (dissoc :loopPath))
+                         constraint))))
+    query))
+
+(defn enforce-constraints-valueless
+  "IS NULL and IS NOT NULL constraints shouldn't have a value."
+  [query]
+  (if (contains? query :where)
+    (update query :where
+            (partial mapv
+                     (fn [{:keys [op] :as constraint}]
+                       (if (contains? #{"IS NULL" "IS NOT NULL"} op)
+                         (cond-> constraint
+                           (contains? constraint :value) (dissoc :value)
+                           (contains? constraint :values) (dissoc :values))
+                         constraint))))
+    query))
+
 (defn enforce-sort-order
   "Makes sure the query XML will have a sortOrder attribute instead of orderBy.
   Only the former is supported as part of the PathQuery API."
@@ -127,6 +167,8 @@
 (def sterilize-query (comp
                       enforce-sorting
                       enforce-sort-order
+                      enforce-constraints-valueless
+                      enforce-constraints-loop-as-value
                       enforce-constraints-have-class
                       enforce-constraints-have-code
                       enforce-joins-have-class
@@ -146,7 +188,7 @@
                           (:constraintLogic query) (assoc :constraintLogic (:constraintLogic query))
                           (:sortOrder query) (assoc :sortOrder (clojure.string/join " " (flatten (map (juxt :path :direction) (:sortOrder query)))))
                           (:title query) (assoc :name (:title query)))]
-    (str "<query " (stringiy-map head-attributes) ">"
+    (str "<query " (stringify-map head-attributes) ">"
          (when (:joins query) (apply str (map make-join (:joins query))))
 
          (apply str (map (partial map->xmlstr "constraint") (:where query)))
