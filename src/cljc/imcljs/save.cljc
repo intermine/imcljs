@@ -3,7 +3,7 @@
   (:require [imcljs.internal.io :refer [restful]]
             [imcljs.fetch :as fetch :refer [lists]]
             [imcljs.internal.utils :refer [copy-list-query <<!]]
-            [clojure.string :refer [join]]
+            [clojure.string :refer [join blank?]]
             #?(:cljs [cljs.core.async :as a :refer [<! >! chan]]
                :clj
                [clojure.core.async :as a :refer [<! >! go chan]])))
@@ -126,3 +126,11 @@
   [service key & [options]]
   (let [params (merge {:key key} options)]
     (restful :delete "/bluegenes-properties" service params)))
+
+(defn feedback
+  "Uses the mine's email service to send an email to the maintainers.
+  Email is optional and will be excluded if nil or empty."
+  [service email feedback & [options]]
+  (let [params (cond-> {:feedback feedback}
+                 (not (blank? email)) (assoc :email email))]
+    (restful :post "/feedback" service (merge params options))))
