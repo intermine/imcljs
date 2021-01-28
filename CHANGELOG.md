@@ -1,3 +1,13 @@
+## 1.4.0 (2021-01-28)
+
+[#54](https://github.com/intermine/imcljs/pull/54)
+- Changes to `query/sterilize-query`
+    - Handle loop constraint loopPath as value
+    - Remove value/values from IS NULL and IS NOT NULL constraints
+- Escape invalid characters in XML attribute value when generating PathQuery XML
+- Support more webservices `fetch/semantic-markup` and `save/feedback`
+- Rename `query/stringiy-map` typo to `query/stringify-map`
+
 ## 1.3.2 (2021-01-20)
 
 [#53](https://github.com/intermine/imcljs/pull/53)
