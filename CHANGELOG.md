@@ -1,3 +1,7 @@
+## 1.4.1 (2021-01-29)
+
+- CLJ: Always return body for successful response when no xform (makes behaviour consistent with CLJS)
+
 ## 1.4.0 (2021-01-28)
 
 [#54](https://github.com/intermine/imcljs/pull/54)
