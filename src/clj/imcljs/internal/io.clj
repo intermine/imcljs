@@ -46,10 +46,9 @@
 (defn parse-response
   "Perform a transformation function (if present) on a successful HTTP request"
   [xform response]
-  (if xform
-    (if (<= 200 (:status response) 300)
-      (xform (:body response))
-      response)
+  (if (<= 200 (:status response) 300)
+    (cond-> (:body response)
+      xform (xform))
     response))
 
 (defn wrap-basic-auth [request]
@@ -59,19 +58,20 @@
 
 (defn get-body-wrapper-
   [path {:keys [root token model]} options & [xform]]
-  (parse-response xform (client/get (url root path)
-                                    (-> {} ; Blank request map
-                                        ;(wrap-accept)
-                                        (wrap-request-defaults xform) ; Add defaults such as with-credentials false?
-                                        (wrap-get-defaults options) ; Add query params
-                                        ; If we have basic auth options then convert them from the cljs-http to clj-http format
-                                        (wrap-basic-auth)
-                                        (wrap-auth token)
-                                        (merge {:as :json})))))
+  (parse-response xform
+                  (client/get (url root path)
+                              (-> {} ; Blank request map
+                                  ;(wrap-accept)
+                                  (wrap-request-defaults xform) ; Add defaults such as with-credentials false?
+                                  (wrap-get-defaults options) ; Add query params
+                                  ; If we have basic auth options then convert them from the cljs-http to clj-http format
+                                  (wrap-basic-auth)
+                                  (wrap-auth token)
+                                  (merge {:as :json})))))
 
 (defn post-body-wrapper-
   [path {:keys [root token model]} options & [xform]]
-  (parse-response (or xform identity)
+  (parse-response xform
                   (client/post (url root path)
                                (-> options ; Blank request map
                                   ;(wrap-accept)
@@ -85,7 +85,7 @@
 
 (defn put-body-wrapper-
   [path {:keys [root token model]} options & [xform]]
-  (parse-response (or xform identity)
+  (parse-response xform
                   (client/put (url root path)
                               (-> options ; Blank request map
                                  ;(wrap-accept)
@@ -103,7 +103,8 @@
 (defn request
   [method path {:keys [root token model] :as service} options & [xform]]
   (let [http-fn (get method-map method)]
-    (parse-response xform (http-fn (url root path) (xform-options service options)))))
+    (parse-response xform
+                    (http-fn (url root path) (xform-options service options)))))
 
 
 ; We're using a multimethod with just one default method because clj-http
@@ -118,7 +119,8 @@
 
 (defmethod restful :raw [_ method path {:keys [root token model] :as service} request & [xform]]
   (let [http-fn (get method-map method)]
-    (parse-response xform (http-fn (url root path) (merge request (merge {:as :json}))))))
+    (parse-response xform
+                    (http-fn (url root path) (merge request (merge {:as :json}))))))
 
 (defmethod restful :get [method path service options & [xform]]
   (get-body-wrapper- path service (merge options {:accept :json}) xform))

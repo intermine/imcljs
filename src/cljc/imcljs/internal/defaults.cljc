@@ -31,6 +31,7 @@
 (defn wrap-request-defaults [m & [xform]]
   (assoc m
          :with-credentials? false
+         ;; Note that `:channel` only has an effect on cljs-http, and does nothing on clj-http.
          :channel (chan 1 (map (transform-if-successful (or xform identity))))))
 
 (defn wrap-post-defaults [request options & [model]]
