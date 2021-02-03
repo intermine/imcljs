@@ -1,3 +1,8 @@
+## 1.4.2 (2021-02-03)
+
+- Avoid throwing when generating PathQuery XML with nil attributes (likely model name)
+    - Bug introduced with `query/escape-attribute` in 1.4.0
+
 ## 1.4.1 (2021-01-29)
 
 - CLJ: Always return body for successful response when no xform (makes behaviour consistent with CLJS)
