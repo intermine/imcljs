@@ -57,7 +57,7 @@
 (defn stringify-map
   [m]
   (reduce (fn [total [k v]]
-            (str total (when total " ") (name k) "=" (str \" (escape-attribute v) \")))
+            (str total (when total " ") (name k) "=" (str \" (-> v str escape-attribute) \")))
           nil
           m))
 
