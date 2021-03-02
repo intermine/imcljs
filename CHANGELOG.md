@@ -1,3 +1,7 @@
+## 1.4.3 (2021-03-02)
+
+- Support new elinks webservice with `fetch/external-links`
+
 ## 1.4.2 (2021-02-03)
 
 - Avoid throwing when generating PathQuery XML with nil attributes (likely model name)
