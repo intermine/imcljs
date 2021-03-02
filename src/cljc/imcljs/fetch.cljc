@@ -90,6 +90,10 @@
   [service & [options]]
   (restful :get "/listswithobject" service options :lists))
 
+(defn external-links
+  [service object-id & [options]]
+  (restful :get "/elinks" service (merge {:id object-id} options) :links))
+
 (defn model
   [service & [options]]
   (restful :get "/model" service options :model))
