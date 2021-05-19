@@ -136,17 +136,19 @@
 
 (defn chart-widget
   "Returns data to produce a graph for a list.
-  Can be passed either a list name or a vector of object IDs."
-  [service list+ids widget-name type & [options]]
-  (let [params (merge {:widget widget-name :type type}
+  Can be passed either a list name or a vector of object IDs.
+  Note that `:type` has to be specified in `options` if passing object IDs."
+  [service list+ids widget-name & [options]]
+  (let [params (merge {:widget widget-name}
                       (if (sequential? list+ids) {:ids (str/join "," list+ids)} {:list list+ids}))]
     (restful :post "/list/chart" service (merge params options))))
 
 (defn table-widget
   "Returns data for displaying by a table widget.
-  Can be passed either a list name or a vector of object IDs."
-  [service list+ids widget-name type & [options]]
-  (let [params (merge {:widget widget-name :type type}
+  Can be passed either a list name or a vector of object IDs.
+  Note that `:type` has to be specified in `options` if passing object IDs."
+  [service list+ids widget-name & [options]]
+  (let [params (merge {:widget widget-name}
                       (if (sequential? list+ids) {:ids (str/join "," list+ids)} {:list list+ids}))]
     (restful :post "/list/table" service (merge params options))))
 
