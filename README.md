@@ -117,7 +117,7 @@ lein test
 1. Update the version number in [project.clj](https://github.com/intermine/imcljs/blob/dev/project.clj#L1)
 2. Don't forget to add the new version with notes to **CHANGELOG.md**.
 3. Tag the [release with a matching version number in git and push the tag to GitHub](https://git-scm.com/book/en/v2/Git-Basics-Tagging)
-4. To [push the release to Clojars](https://github.com/clojars/clojars-web/wiki/Pushing), type `lein deploy clojars`. **Note** that you'll need to have a clojars account that is a member of the [org.intermine](https://clojars.org/search?q=org.intermine) team. Currently (October 2018)  this is @yochannah, @sergio, @danielabutano and @julie-sullivan.
+4. To [push the release to Clojars](https://github.com/clojars/clojars-web/wiki/Pushing), type `lein deploy clojars`. **Note** that you'll need to have a clojars account that is a member of the [org.intermine](https://clojars.org/search?q=org.intermine) team.
 
 ### API Docs
 
