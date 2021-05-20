@@ -3,6 +3,7 @@
 
   (:require [imcljs.internal.io :refer [restful]]
             [imcljs.query :as im-query]
+            [clojure.string :as str]
             #?(:cljs [cljs.core.async :refer [<! >! chan timeout]]
                :clj
                [clojure.core.async :refer [<! >! timeout go go-loop chan]])))
@@ -128,13 +129,28 @@
   [service & [options]]
   (restful :get "/widgets" service {:format "json"} :widgets))
 
-; Enrichment
-
 (defn enrichment
   "Returns enrichment results"
   [service & [options]]
   (restful :post "/list/enrichment" service (merge imcljs.internal.defaults/default-enrichment options)))
 
+(defn chart-widget
+  "Returns data to produce a graph for a list.
+  Can be passed either a list name or a vector of object IDs.
+  Note that `:type` has to be specified in `options` if passing object IDs."
+  [service list+ids widget-name & [options]]
+  (let [params (merge {:widget widget-name}
+                      (if (sequential? list+ids) {:ids (str/join "," list+ids)} {:list list+ids}))]
+    (restful :post "/list/chart" service (merge params options))))
+
+(defn table-widget
+  "Returns data for displaying by a table widget.
+  Can be passed either a list name or a vector of object IDs.
+  Note that `:type` has to be specified in `options` if passing object IDs."
+  [service list+ids widget-name & [options]]
+  (let [params (merge {:widget widget-name}
+                      (if (sequential? list+ids) {:ids (str/join "," list+ids)} {:list list+ids}))]
+    (restful :post "/list/table" service (merge params options))))
 
 ; Versions
 
