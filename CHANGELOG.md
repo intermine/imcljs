@@ -1,3 +1,8 @@
+## 1.4.4 (2021-05-20)
+
+- Support for `/list/chart` widget with `fetch/chart-widget`
+- Support for `/list/table` widget with `fetch/table-widget`
+
 ## 1.4.3 (2021-03-02)
 
 - Support new elinks webservice with `fetch/external-links`
