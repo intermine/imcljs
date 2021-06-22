@@ -296,10 +296,17 @@
   (let [params {:id id}]
     (restful :get "/permanent-url" service (merge params options) :url)))
 
-; Semantic markup
+; Server-side stuff
 
 (defn semantic-markup
   "Returns the JSON semantic markup for a page. See web service documentation
   for supported pages and their required parameters."
   [service page & [options]]
   (restful :get (str "/semantic-markup/" page) service options :semantic-markups))
+
+(defn entity-representation
+  "Responds with the representation of an entity in the specified format.
+  LUI needs to be a string similar to `gene:FBgn0030596`."
+  [service lui format & [options]]
+  (let [params {:lui lui :format format}]
+    (restful :get "/entity-representation" service (merge params options))))
