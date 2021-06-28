@@ -1,3 +1,7 @@
+## 1.4.5 (2021-06-28)
+
+- Support new entity representation web service with `fetch/entity-representation`
+
 ## 1.4.4 (2021-05-20)
 
 - Support for `/list/chart` widget with `fetch/chart-widget`
