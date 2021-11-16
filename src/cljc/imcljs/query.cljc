@@ -25,34 +25,35 @@
                     ">" "&gt;"
                     ">=" "&gt;="})
 
+(let [cmap {\" "&quot;"
+            \> "&gt;"
+            \< "&lt;"
+            \& "&amp;"}]
+  (defn escape-attribute
+    "Replace double quotation mark, angle brackets and ampersand characters with
+    their HTML entity, as these are not permitted in XML attribute values."
+    [s]
+    (escape s cmap)))
+
 (defn map->xmlstr
   "xml string representation of an edn map.
   (map->xlmstr constraint {:key1 val1 key2 val2}) => <constraint key1=val1 key2=val2 />"
   [elem m]
   (let [m      (cond-> m (contains? m :ids) ids->constraint)
-        m      (select-keys m [:path :value :values :type :op :code])
+        m      (select-keys m [:path :value :values :type :op :code :description :editable :switchable])
         values (:values m)]
 
     (str "\n   <" elem " "
          (reduce (fn [total [k v]]
                    (if (not= k :values)
-                     (str total (if total " ") (name k)
+                     (str total (when total " ") (name k)
                           "="
-                          (str \" (if (= k :op) (get html-entities v v) v) \"))
+                          (str \" (-> v str escape-attribute) \"))
                      total))
                  nil m)
          (if values
            (str ">" (apply str (map value values)) "</" elem ">")
            "/>"))))
-
-(let [cmap {\" "&quot;"
-            \< "&lt;"
-            \& "&amp;"}]
-  (defn escape-attribute
-    "Replace double quotation mark, less than and ampersand characters with
-    their HTML entity, as these are not permitted in XML attribute values."
-    [s]
-    (escape s cmap)))
 
 (defn stringify-map
   [m]
@@ -187,7 +188,8 @@
                                  :view (clojure.string/join " " (:select query))}
                           (:constraintLogic query) (assoc :constraintLogic (:constraintLogic query))
                           (:sortOrder query) (assoc :sortOrder (clojure.string/join " " (flatten (map (juxt :path :direction) (:sortOrder query)))))
-                          (:title query) (assoc :name (:title query)))]
+                          (:title query) (assoc :name (:title query))
+                          (:longDescription query) (assoc :longDescription (:longDescription query)))]
     (str "<query " (stringify-map head-attributes) ">"
          (when (:joins query) (apply str (map make-join (:joins query))))
 
