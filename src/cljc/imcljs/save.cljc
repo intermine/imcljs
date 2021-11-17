@@ -134,3 +134,10 @@
   (let [params (cond-> {:feedback feedback}
                  (not (blank? email)) (assoc :email email))]
     (restful :post "/feedback" service (merge params options))))
+
+(defn template
+  "Save a template, or overwrite an existing with the same name.
+  Takes one or more templates each containing a query, serialised in XML or JSON."
+  [service template-query & [options]]
+  (let [params (merge {:query template-query} options)]
+    (restful :post "/template/upload" service params)))
