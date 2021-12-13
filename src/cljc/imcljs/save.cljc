@@ -118,7 +118,7 @@
   Requires that you are authenticated as an admin."
   [service key value & [options]]
   (let [params (merge {:key key :value value} options)]
-    (restful :put "/bluegenes-properties" service params)))
+    (restful :put-body "/bluegenes-properties" service params)))
 
 (defn delete-bluegenes-properties
   "Delete an existing key in the BlueGenes-specific config for a mine.
