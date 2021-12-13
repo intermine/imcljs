@@ -310,3 +310,17 @@
   [service lui format & [options]]
   (let [params {:lui lui :format format}]
     (restful :get "/entity-representation" service (merge params options))))
+
+; Template properties
+
+(defn precompute
+  "Returns the precomputed status of a named template, or all templates owned
+  by the superuser. Use parameter `name` for a single template."
+  [service & [options]]
+  (restful :get "/template/precompute" service options :templates))
+
+(defn summarise
+  "Returns the summarise status of a named template, or all templates owned
+  by the superuser. Use parameter `name` for a single template."
+  [service & [options]]
+  (restful :get "/template/summarise" service options :templates))

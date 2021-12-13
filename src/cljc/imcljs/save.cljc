@@ -141,3 +141,37 @@
   [service template-query & [options]]
   (let [params (merge {:query template-query} options)]
     (restful :post "/template/upload" service params)))
+
+(defn delete-template
+  "Delete a template by name."
+  [service template-name & [options]]
+  (let [params (merge {:name template-name} options)]
+    (restful :delete (str "/templates/" template-name) service params)))
+
+(defn precompute
+  "Precompute a template by name. Must be owned by superuser."
+  [service template-name & [options]]
+  (let [params (merge {:name template-name} options)]
+    (restful :post "/template/precompute" service params :templates)))
+
+(defn summarise
+  "Summarise a template by name. Must be owned by superuser."
+  [service template-name & [options]]
+  (let [params (merge {:name template-name} options)]
+    (restful :post "/template/summarise" service params :templates)))
+
+(defn template-add-tags
+  "Add one or more tags to a template."
+  [service template-name tags & [options]]
+  (let [params (merge {:name template-name
+                       :tags (if (coll? tags) (join ";" tags) tags)}
+                      options)]
+    (restful :post "/template/tags" service params)))
+
+(defn template-remove-tags
+  "Delete one or more tags from a template."
+  [service template-name tags & [options]]
+  (let [params (merge {:name template-name
+                       :tags (if (coll? tags) (join ";" tags) tags)}
+                      options)]
+    (restful :delete "/template/tags" service params)))
