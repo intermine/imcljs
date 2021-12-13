@@ -53,14 +53,14 @@
 (defn im-list-add-tag
   [service name tags & [options]]
   (restful :post "/list/tags" service (merge {:name name
-                                              :tags (if (coll? tags) (interpose ";" tags) tags)
+                                              :tags (if (coll? tags) (join ";" tags) tags)
                                               :format "json"}
                                              options)))
 
 (defn im-list-remove-tag
   [service name tags & [options]]
   (restful :delete "/list/tags" service (merge {:name name
-                                                :tags (if (coll? tags) (interpose ";" tags) tags)
+                                                :tags (if (coll? tags) (join ";" tags) tags)
                                                 :format "json"}
                                                options)))
 
