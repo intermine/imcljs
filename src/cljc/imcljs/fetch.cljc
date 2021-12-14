@@ -324,3 +324,9 @@
   by the superuser. Use parameter `name` for a single template."
   [service & [options]]
   (restful :get "/template/summarise" service options :templates))
+
+(defn template-tags
+  "Get the tags for a named template, or all the tags associated with the
+  authenticating user. Use parameter `name` for a single template."
+  [service & [options]]
+  (restful :get "/template/tags" service options :tags))
