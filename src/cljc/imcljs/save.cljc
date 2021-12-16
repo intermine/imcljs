@@ -116,9 +116,12 @@
 (defn update-bluegenes-properties
   "Update an existing key in the BlueGenes-specific config for a mine.
   Requires that you are authenticated as an admin."
-  [service key value & [options]]
-  (let [params (merge {:key key :value value} options)]
-    (restful :put-body "/bluegenes-properties" service params)))
+  [service key value & [options legacy?]]
+  (let [params (merge {:key key :value value} options)
+        ;; For IM<5.0.4 we need to use :put with query params. Beyond that,
+        ;; we want to default to :put-body to accommodate larger values.
+        method (if legacy? :put :put-body)]
+    (restful method "/bluegenes-properties" service params)))
 
 (defn delete-bluegenes-properties
   "Delete an existing key in the BlueGenes-specific config for a mine.
