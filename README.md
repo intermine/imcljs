@@ -96,6 +96,20 @@ Most result-fetching functions require that the `:model` key be present in their
 
 ## Development
 
+### REPL
+
+It's useful to have a live interactive environment to invoke imcljs when developing. You can get this by running:
+
+```
+$ lein repl
+user=> (fig-start)
+# Figwheel: Starting server at http://0.0.0.0:5003
+# Open this URL in your browser.
+user=> (cljs-repl)
+```
+
+You can now use `require` to test parts of imcljs and dependencies. Even better, if you install an nREPL plugin to your editor, you can load any namespace and evaluate arbitrary code all from your editor (`src/cljs/imcljs/core.cljs` has useful code for testing). **Keep an eye on your browser devtool's Network and Console tabs**; it's great for debugging requests and seeing the output when running code.
+
 ### Running tests
 
 **Required dependency:** phantomjs, to run the tests in a headless javascript engine. You'll need a recent version of node installed, perhaps via [nvm](https://github.com/creationix/nvm). Once node is installed, run `npm install -g phantomjs` to install phantomjs. 
