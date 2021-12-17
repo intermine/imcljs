@@ -1,3 +1,22 @@
+## 1.5.0 (2021-12-17)
+
+- New `:put-body` method, primarily for `imcljs.save/update-bluegenes-properties` to avoid hitting query param payload limit
+    - `legacy?` flag added to use for IM<5.0.4 which don't read the PUT body
+- Make `imcljs.query/->xml` support generating XML for templates to be uploaded
+    - **BREAKING:** This means template-specific constraint attributes like `editable` and `switchable` are no longer ignored, and InterMine will respond with an error if these are present within a regular query
+    - Includes comprehensive escaping for attribute value characters not compatible with XML
+- Handle `:query` with a value of string, in which case it will be passed on instead of throwing
+- New methods for template-related web services
+    - `save/template`
+    - `save/delete-template`
+    - `fetch/template-tags`
+    - `save/template-add-tags`
+    - `save/template-remove-tags`
+    - `fetch/precompute` **IM 5.0.4**
+    - `fetch/summarise` **IM 5.0.4**
+    - `save/precompute` **IM 5.0.4**
+    - `save/summarise` **IM 5.0.4**
+
 ## 1.4.5 (2021-06-28)
 
 - Support new entity representation web service with `fetch/entity-representation`
