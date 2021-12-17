@@ -53,14 +53,14 @@
 (defn im-list-add-tag
   [service name tags & [options]]
   (restful :post "/list/tags" service (merge {:name name
-                                              :tags (if (coll? tags) (interpose ";" tags) tags)
+                                              :tags (if (coll? tags) (join ";" tags) tags)
                                               :format "json"}
                                              options)))
 
 (defn im-list-remove-tag
   [service name tags & [options]]
   (restful :delete "/list/tags" service (merge {:name name
-                                                :tags (if (coll? tags) (interpose ";" tags) tags)
+                                                :tags (if (coll? tags) (join ";" tags) tags)
                                                 :format "json"}
                                                options)))
 
@@ -116,9 +116,12 @@
 (defn update-bluegenes-properties
   "Update an existing key in the BlueGenes-specific config for a mine.
   Requires that you are authenticated as an admin."
-  [service key value & [options]]
-  (let [params (merge {:key key :value value} options)]
-    (restful :put "/bluegenes-properties" service params)))
+  [service key value & [options legacy?]]
+  (let [params (merge {:key key :value value} options)
+        ;; For IM<5.0.4 we need to use :put with query params. Beyond that,
+        ;; we want to default to :put-body to accommodate larger values.
+        method (if legacy? :put :put-body)]
+    (restful method "/bluegenes-properties" service params)))
 
 (defn delete-bluegenes-properties
   "Delete an existing key in the BlueGenes-specific config for a mine.
@@ -134,3 +137,44 @@
   (let [params (cond-> {:feedback feedback}
                  (not (blank? email)) (assoc :email email))]
     (restful :post "/feedback" service (merge params options))))
+
+(defn template
+  "Save a template, or overwrite an existing with the same name.
+  Takes one or more templates each containing a query, serialised in XML or JSON."
+  [service template-query & [options]]
+  (let [params (merge {:query template-query} options)]
+    (restful :post "/template/upload" service params)))
+
+(defn delete-template
+  "Delete a template by name."
+  [service template-name & [options]]
+  (let [params (merge {:name template-name} options)]
+    (restful :delete (str "/templates/" template-name) service params)))
+
+(defn precompute
+  "Precompute a template by name. Must be owned by superuser."
+  [service template-name & [options]]
+  (let [params (merge {:name template-name} options)]
+    (restful :post "/template/precompute" service params :templates)))
+
+(defn summarise
+  "Summarise a template by name. Must be owned by superuser."
+  [service template-name & [options]]
+  (let [params (merge {:name template-name} options)]
+    (restful :post "/template/summarise" service params :templates)))
+
+(defn template-add-tags
+  "Add one or more tags to a template."
+  [service template-name tags & [options]]
+  (let [params (merge {:name template-name
+                       :tags (if (coll? tags) (join ";" tags) tags)}
+                      options)]
+    (restful :post "/template/tags" service params)))
+
+(defn template-remove-tags
+  "Delete one or more tags from a template."
+  [service template-name tags & [options]]
+  (let [params (merge {:name template-name
+                       :tags (if (coll? tags) (join ";" tags) tags)}
+                      options)]
+    (restful :delete "/template/tags" service params)))

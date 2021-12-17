@@ -37,7 +37,7 @@
 (defn wrap-post-defaults [request options & [model]]
   (if options
     (assoc request :form-params (cond-> options
-                                  (contains? options :query) (assoc :query (->xml model (:query options)))
+                                  (map? (:query options)) (assoc :query (->xml model (:query options)))
                                   (missing? options :format) (assoc :format "json")))
     request))
 
@@ -45,6 +45,12 @@
   (if options
     (assoc request :query-params (cond-> options
                                    (missing? options :format) (assoc :format "json")))
+    request))
+
+(defn wrap-put-body-defaults [request options]
+  (if options
+    (assoc request :form-params (cond-> options
+                                  (missing? options :format) (assoc :format "json")))
     request))
 
 (defn wrap-get-defaults [request options]

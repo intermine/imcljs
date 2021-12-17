@@ -3,9 +3,8 @@
             [imcljs.internal.utils :refer [assert-args]]
             [imcljs.internal.defaults
              :refer [url wrap-get-defaults wrap-request-defaults
-                     wrap-post-defaults wrap-put-defaults wrap-auth
-                     wrap-accept wrap-delete-defaults
-                     transform-if-successful]]))
+                     wrap-post-defaults wrap-put-defaults wrap-put-body-defaults
+                     wrap-auth wrap-accept wrap-delete-defaults transform-if-successful]]))
 
 ;(defn body-
 ;  "Parses the body of the web service response.
@@ -57,6 +56,16 @@
            (wrap-put-defaults options) ; Add form params
            (wrap-auth token))))
 
+(defn put-body-wrapper-
+  "Returns the results of queries as table rows."
+  [path {:keys [root token model]} options & [xform]]
+  (put (url root path)
+       (-> {}
+           ;(wrap-accept)
+           (wrap-request-defaults xform) ; Add defaults such as with-credentials false?
+           (wrap-put-body-defaults options)
+           (wrap-auth token))))
+
 (defn delete-wrapper-
   "Returns the results of queries as table rows."
   [path {:keys [root token model]} options & [xform]]
@@ -97,26 +106,30 @@
 ;  (let [http-fn (case method :get get :post post :delete delete)]
 ;    (http-fn (url root path) request)))
 
-(defmethod restful :post [method path service options & [xform]]
-  ;(body- (post-wrapper- path service options) xform)
-  (post-wrapper- path service options xform))
-
-(defmethod restful :put [method path service options & [xform]]
-  ;(body- (put-wrapper- path service options) xform)
-  (put-wrapper- path service options xform))
-
 (defmethod restful :raw [_ method path {:keys [root token model] :as service} request & [xform]]
   ;(body- (post-wrapper- path service options) xform)
   (let [http-fn (case method :get get :post post :delete delete)]
     (http-fn (url root path) (wrap-request-defaults request xform))))
 
+(defmethod restful :get [method path service options & [xform]]
+  ;(body- (request-wrapper- path service options) xform)
+  (request-wrapper- path service options xform))
+
+(defmethod restful :post [method path service options & [xform]]
+  ;(body- (post-wrapper- path service options) xform)
+  (post-wrapper- path service options xform))
+
 (defmethod restful :post-body [method path service options & [xform]]
   ;(body- (post-wrapper- path service options) xform)
   (post-body-wrapper- path service options xform))
 
-(defmethod restful :get [method path service options & [xform]]
-  ;(body- (request-wrapper- path service options) xform)
-  (request-wrapper- path service options xform))
+(defmethod restful :put [method path service options & [xform]]
+  ;(body- (put-wrapper- path service options) xform)
+  (put-wrapper- path service options xform))
+
+(defmethod restful :put-body [method path service options & [xform]]
+  ;(body- (put-wrapper- path service options) xform)
+  (put-body-wrapper- path service options xform))
 
 (defmethod restful :delete [method path service options & [xform]]
   (delete-wrapper- path service options xform))
