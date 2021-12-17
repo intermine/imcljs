@@ -28,17 +28,11 @@
                        :where [{:path "Gene",
                                 :op "LOOKUP",
                                 :value "ABRA",
-                                :code "B",
-                                :editable true,
-                                :switched "LOCKED",
-                                :switachable false}
+                                :code "B"}
                                {:path "proteins.genes.organism.name",
                                 :op "=",
                                 :value "Plasmodium falciparum 3D7",
-                                :code "C",
-                                :editable true,
-                                :switched "LOCKED",
-                                :switchable false}]})
+                                :code "C"}]})
 
 (deftest outer-join
   (testing "Query support for outer joins"
