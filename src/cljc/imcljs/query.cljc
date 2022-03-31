@@ -204,11 +204,24 @@
   Make sure to add :type-constraints to the model if the path traverses a subclass
   (see docstring of `imcljs.path/walk` for more information)."
   [model query]
-  (let [query (sterilize-query query)]
+  (let [query (sterilize-query query)
+        ;; Inner joins are default for every class in the view, which means
+        ;; once they're removed from the view, we need their equivalent as
+        ;; constraints to query the same set of objects.
+        substitute-constraints (map (fn [class-path]
+                                      {:path (str class-path ".id")
+                                       :op "IS NOT NULL"})
+                                    (into #{}
+                                          (comp (map #(path/trim-to-last-class model %))
+                                                ;; Except for outer joins, in which case we shouldn't constrain for their existence.
+                                                (remove #(contains? (set (:joins query)) %)))
+                                          (:select query)))]
     (reduce (fn [path-map next-path]
               (update path-map (path/class model next-path)
                       assoc (path/trim-to-last-class model next-path)
-                      {:query (assoc query :select [(str (path/trim-to-last-class model next-path) ".id")])}))
+                      {:query (-> query
+                                  (assoc :select [(str (path/trim-to-last-class model next-path) ".id")])
+                                  (update :where into substitute-constraints))}))
             {} (:select query))))
 
 (defn group-views-by-class
