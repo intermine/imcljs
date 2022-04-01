@@ -196,6 +196,21 @@
          (apply str (map (partial map->xmlstr "constraint") (:where query)))
          "\n</query>")))
 
+(defn- substitute-constraints
+  "Inner joins are default for every class in the view, which means once
+  they're removed from the view, we need their equivalent as constraints to
+  query the same set of objects. This doesn't apply to outer joins and the only
+  selected path, which won't get added as constraints."
+  [model query select-path]
+  (let [joins (conj (set (:joins query)) select-path)]
+    (map (fn [class-path]
+           {:path (str class-path ".id")
+            :op "IS NOT NULL"})
+         (into #{}
+               (comp (map #(path/trim-to-last-class model %))
+                     (remove #(contains? joins %)))
+               (:select query)))))
+
 (defn deconstruct-by-class
   "Deconstructs a query by its views and groups them by class.
   (deconstruct-by-class model query)
@@ -204,24 +219,14 @@
   Make sure to add :type-constraints to the model if the path traverses a subclass
   (see docstring of `imcljs.path/walk` for more information)."
   [model query]
-  (let [query (sterilize-query query)
-        ;; Inner joins are default for every class in the view, which means
-        ;; once they're removed from the view, we need their equivalent as
-        ;; constraints to query the same set of objects.
-        substitute-constraints (map (fn [class-path]
-                                      {:path (str class-path ".id")
-                                       :op "IS NOT NULL"})
-                                    (into #{}
-                                          (comp (map #(path/trim-to-last-class model %))
-                                                ;; Except for outer joins, in which case we shouldn't constrain for their existence.
-                                                (remove #(contains? (set (:joins query)) %)))
-                                          (:select query)))]
+  (let [query (sterilize-query query)]
     (reduce (fn [path-map next-path]
-              (update path-map (path/class model next-path)
-                      assoc (path/trim-to-last-class model next-path)
-                      {:query (-> query
-                                  (assoc :select [(str (path/trim-to-last-class model next-path) ".id")])
-                                  (update :where into substitute-constraints))}))
+              (let [select-path (path/trim-to-last-class model next-path)]
+                (update path-map (path/class model next-path)
+                        assoc (path/trim-to-last-class model next-path)
+                        {:query (-> query
+                                    (assoc :select [(str select-path ".id")])
+                                    (update :where into (substitute-constraints model query select-path)))})))
             {} (:select query))))
 
 (defn group-views-by-class
@@ -232,10 +237,13 @@
   [model query]
   (let [query (sterilize-query query)]
     (reduce (fn [path-map next-path]
-              (update path-map (path/class model next-path)
-                      (comp vec set conj)
-                      {:path (str (path/trim-to-last-class model next-path) ".id")
-                       :type (path/class model next-path)
-                       :query (assoc query :select [(str (path/trim-to-last-class model next-path) ".id")])}))
+              (let [select-path (path/trim-to-last-class model next-path)]
+                (update path-map (path/class model next-path)
+                        (comp vec set conj)
+                        {:path (str (path/trim-to-last-class model next-path) ".id")
+                         :type (path/class model next-path)
+                         :query (-> query
+                                    (assoc :select [(str select-path ".id")])
+                                    (update :where into (substitute-constraints model query select-path)))})))
             {} (:select query))))
 
