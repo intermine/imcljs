@@ -1,3 +1,8 @@
+## 1.6.0 (2022-04-07)
+
+- Make `query/deconstruct-by-class` and `query/group-views-by-class` match legacy im-tables behaviour
+    - See [imcljs PR](https://github.com/intermine/imcljs/pull/59) and [Bluegenes issue](https://github.com/intermine/bluegenes/issues/797) for details
+
 ## 1.5.0 (2021-12-17)
 
 - New `:put-body` method, primarily for `imcljs.save/update-bluegenes-properties` to avoid hitting query param payload limit
