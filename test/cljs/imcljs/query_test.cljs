@@ -48,21 +48,6 @@
       (go
         (let [model (<! (fetch/model service))]
           (let [result (query/deconstruct-by-class model normal-query)]
-            (is (= result {:Gene
-                           {"Gene.proteins.genes"
-                            {:query
-                             {:where [{:path "Gene.symbol", :value "ABRA", :op "=", :code "A"}]
-                              :from "Gene"
-                              :select ["Gene.proteins.genes.id"]}}
-                            "Gene"
-                            {:query
-                             {:where [{:path "Gene.symbol", :value "ABRA", :op "=", :code "A"}]
-                              :from "Gene"
-                              :select ["Gene.id"]}}}
-                           :Organism
-                           {"Gene.organism"
-                            {:query
-                             {:where [{:path "Gene.symbol", :value "ABRA", :op "=", :code "A"}]
-                              :from "Gene"
-                              :select ["Gene.organism.id"]}}}}))
+            (is (= result
+                   {:Gene {"Gene" {:query {:from "Gene", :select ["Gene.id"], :where [{:path "Gene.symbol", :op "=", :value "ABRA", :code "A"} {:path "Gene.organism.id", :op "IS NOT NULL"} {:path "Gene.proteins.genes.id", :op "IS NOT NULL"}]}}, "Gene.proteins.genes" {:query {:from "Gene", :select ["Gene.proteins.genes.id"], :where [{:path "Gene.symbol", :op "=", :value "ABRA", :code "A"} {:path "Gene.id", :op "IS NOT NULL"} {:path "Gene.organism.id", :op "IS NOT NULL"}]}}}, :Organism {"Gene.organism" {:query {:from "Gene", :select ["Gene.organism.id"], :where [{:path "Gene.symbol", :op "=", :value "ABRA", :code "A"} {:path "Gene.id", :op "IS NOT NULL"} {:path "Gene.proteins.genes.id", :op "IS NOT NULL"}]}}}}))
             (done)))))))
